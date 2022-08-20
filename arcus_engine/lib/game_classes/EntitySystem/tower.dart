@@ -47,7 +47,7 @@ class TDTower {
   Rectangle radar = Rectangle(
       x: 0, y: 0, width: 0, height: 0); //Circle(x: 0, y: 0, radius: 40);
 
-  List<TDSpriteAnimator> collisionEffects = [];
+  List<SpriteAnimator> collisionEffects = [];
   TDTower({
     required this.position,
     required this.baseType,
@@ -146,7 +146,7 @@ class TDTower {
   void showCollisionEffect(Point<double> target) {
     var effect = this
         .collisionEffects
-        .cast<TDSpriteAnimator?>()
+        .cast<SpriteAnimator?>()
         .firstWhere((element) => element!.alive == false, orElse: () => null);
     if (effect != null) {
       effect.alive = true;

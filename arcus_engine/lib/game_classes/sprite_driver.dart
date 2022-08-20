@@ -236,7 +236,7 @@ class SpriteDriverCanvas extends CustomPainter {
         return result;
       }, orElse: () => null);
       if (sprite != null) {
-        if (sprite is TDSpriteAnimator) {
+        if (sprite is SpriteAnimator) {
           sprite.position = coords;
           sprite.alive = true;
           sprite.currentIndex = 0;
@@ -257,7 +257,7 @@ class SpriteDriverCanvas extends CustomPainter {
   void addSpriteByType(
       String type, Point<double> coords, String name, String frame) {
     if (type == "TDSpriteAnimator") {
-      this.sprites.add(TDSpriteAnimator(
+      this.sprites.add(SpriteAnimator(
             position: coords,
             textureName: name,
             currentFrame: frame,

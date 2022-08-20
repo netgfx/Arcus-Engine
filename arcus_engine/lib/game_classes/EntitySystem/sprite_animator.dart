@@ -17,7 +17,7 @@ enum LoopMode {
   Repeat,
 }
 
-class TDSpriteAnimator with SpriteArchetype {
+class SpriteAnimator with SpriteArchetype {
   int currentTime = 0;
   late ui.Image currentImage;
   String currentFrame = "";
@@ -34,7 +34,7 @@ class TDSpriteAnimator with SpriteArchetype {
   Offset _centerOffset = Offset(0, 0);
 
   // constructor
-  TDSpriteAnimator({
+  SpriteAnimator({
     required textureName,
     required this.currentFrame,
     required this.loop,

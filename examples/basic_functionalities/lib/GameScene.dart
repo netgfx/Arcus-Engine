@@ -4,6 +4,8 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -109,34 +111,40 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     group.enableDebug = true;
 
     group.addItem(
-      Point<double>(0.0, 0.0),
-      TDSprite(
-        position: Point<double>(0.0, 0.0),
+      const Point<double>(0.0, 0.0),
+      Sprite(
+        position: const Point<double>(0.0, 0.0),
         textureName: "mage1",
         startAlive: true,
         scale: 0.8,
         fitParent: false,
-        centerOffset: Offset(0, 0),
+        centerOffset: const Offset(0, 0),
       ),
     );
 
     sprites = [
-      TDSprite(
-          position: Point<double>(250.0, 40.0),
-          textureName: "redblock",
-          scale: 0.28,
-          zIndex: 2,
-          enablePhysics: true,
-          startAlive: true,
-          fitParent: false,
-          centerOffset: Offset(0, 0)),
-      TDSprite(
-        position: Point<double>(0.0, 0.0),
+      Sprite(
+        position: const Point<double>(250.0, 40.0),
+        textureName: "redblock",
+        scale: 0.28,
+        zIndex: 2,
+        enablePhysics: true,
+        startAlive: true,
+        fitParent: false,
+        centerOffset: const Offset(0, 0),
+        physicsProperties: PhysicsBodyProperties(
+          velocity: Vector2(x: 20, y: 0),
+          restitution: 0.30,
+          friction: 0.95,
+        ),
+      ),
+      Sprite(
+        position: const Point<double>(0.0, 0.0),
         textureName: "bg",
         startAlive: true,
         scale: 1.0,
       ),
-      TDSpriteAnimator(
+      SpriteAnimator(
         position: Point<double>(100.0, 100.0),
         textureName: "bat",
         currentFrame: "fly/Fly2_Bats",
