@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:core';
 import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_image/flutter_native_image.dart' as uiImage;
 import 'package:arcus_engine/game_classes/EntitySystem/sprite_archetype.dart';
@@ -880,5 +881,25 @@ class Utils {
  *  @memberof Utilities */
   sign(a) {
     return a < 0 ? -1 : 1;
+  }
+
+  getCollideSide(PhysicsBodySimple r1, PhysicsBodySimple r2) {
+    var dx = (r1.pos.x + r1.size.x / 2) - (r2.pos.x + r2.size.x / 2);
+    var dy = (r1.pos.y + r1.size.y / 2) - (r2.pos.y + r2.size.y / 2);
+    var width = (r1.size.x + r2.size.x) / 2;
+    var height = (r1.size.y + r2.size.y) / 2;
+    var crossWidth = width * dy;
+    var crossHeight = height * dx;
+    var collision = 'none';
+    //
+    if ((dx).abs() <= width && (dy).abs() <= height) {
+      if (crossWidth > crossHeight) {
+        collision = (crossWidth > (-crossHeight)) ? 'bottom' : 'left';
+      } else {
+        collision = (crossWidth > -(crossHeight)) ? 'right' : 'top';
+      }
+    }
+
+    return (collision);
   }
 }

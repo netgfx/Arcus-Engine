@@ -52,6 +52,7 @@ class PhysicsBodyProperties {
     restitution,
     angleVelocity,
     collideSolidObjects,
+    immovable,
     collideOnWorldBounds,
   }) {
     this.mass = mass ?? 1;
@@ -65,6 +66,7 @@ class PhysicsBodyProperties {
     this.restitution = restitution ?? 0.99;
     this.collideSolidObjects = collideSolidObjects ?? true;
     this.velocity = velocity ?? Vector2(x: 0, y: 0);
+    this.immovable = immovable ?? false;
     collideWorldBounds = collideOnWorldBounds ?? true;
   }
 }
@@ -99,7 +101,6 @@ class PhysicsBodySimple {
   Vector2 _velocity = Vector2(x: 0, y: 0);
 
   double _angleVelocity = 0;
-  bool _immovable = false;
   bool collideSolidObjects = true;
   dynamic object;
   bool collideTiles = true;
@@ -113,6 +114,7 @@ class PhysicsBodySimple {
   bool collideWorldBounds = true;
   double restitution = 0.99;
   String isCollidingAt = "none";
+  bool immovable = false;
   PhysicsBodyProperties physicsProperties;
   PhysicsBodySimple({
     required this.object,
@@ -120,7 +122,7 @@ class PhysicsBodySimple {
     required this.world,
     required this.size,
     required this.physicsProperties,
-    onCollision,
+    this.onCollision,
   }) {
     mass = physicsProperties.mass;
     damping = physicsProperties.damping;
@@ -132,9 +134,10 @@ class PhysicsBodySimple {
     velocity = physicsProperties.velocity;
     angleVelocity = physicsProperties.angleVelocity;
     restitution = physicsProperties.restitution;
+    immovable = physicsProperties.immovable;
     collideSolidObjects = physicsProperties.collideSolidObjects;
     //this.size = size ?? Vector2(x: 0, y: 0);
-    this.onCollision = onCollision ?? () {};
+    //this.onCollision = onCollision;
     collideWorldBounds = physicsProperties.collideWorldBounds;
   }
 
@@ -162,14 +165,6 @@ class PhysicsBodySimple {
     _angleVelocity = value;
   }
 
-  bool get immovable {
-    return _immovable;
-  }
-
-  set immovable(bool value) {
-    _immovable = value;
-  }
-
   dynamic getObject() {
     return object;
   }
@@ -183,9 +178,6 @@ class PhysicsBodySimple {
     this.collideTiles = collideTiles;
   }
 
-  /** Returns a copy of this vector times the vector passed in
-     *  @param {Vector2} vector
-     *  @return {Vector2} */
   multiply(Vector2 v) {
     return Vector2(x: pos.x * v.x, y: pos.y * v.y);
   }
@@ -231,39 +223,57 @@ class PhysicsBodySimple {
   }
 
   /// TODO: needs rework
-  void calculatePhysicsWithBounds(PhysicsBodySimple obj1, dynamic obj2) {
-    var vCollision = {
-      "x": obj2["pos"].x - obj1.pos.x,
-      "y": obj2["pos"].y - obj1.pos.y
-    };
-    var distance = sqrt(
-        (obj2["pos"].x - obj1.pos.x) * (obj2["pos"].x - obj1.pos.x) +
-            (obj2["pos"].y - obj1.pos.y) * (obj2["pos"].y - obj1.pos.y));
-    var vCollisionNorm = {
-      "x": vCollision["x"] / distance,
-      "y": vCollision["y"] / distance
-    };
-    Map<String, dynamic> vRelativeVelocity = {
-      "x": obj1.velocity.x - obj2["velocity"].x,
-      "y": obj1.velocity.y - obj2["velocity"].y
-    };
-    var speed = vRelativeVelocity["x"] * vCollisionNorm["x"] +
-        vRelativeVelocity["y"] * vCollisionNorm["y"];
+  void calculatePhysicsCollision(
+      PhysicsBodySimple obj1, PhysicsBodySimple obj2) {
+    String result = Utils.shared.getCollideSide(obj1, obj2);
+    String result2 = Utils.shared.getCollideSide(obj2, obj1);
+    if (result != "none") {
+      //this.circleIntersect(obj1.x, obj1.y, obj1.getWidth(), obj2.x, obj2.y, obj2.getWidth())) {
+      /// TODO: Detect specific collide point
+      obj1.isCollidingAt = result2;
+      obj2.isCollidingAt = result;
 
-    speed *= min(obj1.restitution, obj2["restitution"] as double);
-    //delayedPrint(speed.toString());
-    if (speed < 0) {
-      return;
+      Map<String, double> vCollision = {
+        "x": obj2.pos.x - obj1.pos.x,
+        "y": obj2.pos.y - obj1.pos.y
+      };
+      double distance = sqrt(
+          (obj2.pos.x - obj1.pos.x) * (obj2.pos.x - obj1.pos.x) +
+              (obj2.pos.y - obj1.pos.y) * (obj2.pos.y - obj1.pos.y));
+      Map<String, double> vCollisionNorm = {
+        "x": vCollision["x"]! / distance,
+        "y": vCollision["y"]! / distance
+      };
+      var vRelativeVelocity = {
+        "x": obj1.velocity.x - obj2.velocity.x,
+        "y": obj1.velocity.y - obj2.velocity.y
+      };
+      var speed = vRelativeVelocity["x"]! * vCollisionNorm["x"]! +
+          vRelativeVelocity["y"]! * vCollisionNorm["y"]!;
+
+      // Apply restitution to the speed
+      speed *= min(obj1.restitution, obj2.restitution);
+      //delayedPrint(speed.toString());
+      if (speed < 0) {
+        return;
+      }
+
+      var impulse = 2 * speed / (obj1.mass + obj2.mass);
+      obj1.velocity.x -= (impulse * obj2.mass * vCollisionNorm["x"]!);
+      obj1.velocity.y -= (impulse * obj2.mass * vCollisionNorm["y"]!);
+      obj2.velocity.x += (impulse * obj1.mass * vCollisionNorm["x"]!);
+      obj2.velocity.y += (impulse * obj1.mass * vCollisionNorm["y"]!);
+
+      obj1.collideWithObject(obj2);
+      obj2.collideWithObject(obj1);
+
+      /// check any one of them is static
+      if (obj2.immovable == true) {
+        obj2.velocity.y = 0;
+      } else if (obj1.immovable == true) {
+        obj1.velocity.y = 0;
+      }
     }
-
-    var impulse = 2 * speed / (obj1.mass + obj2["mass"]);
-    obj1.velocity.x -= (impulse * obj2["mass"] * vCollisionNorm["x"]);
-    obj1.velocity.y -= (impulse * obj2["mass"] * vCollisionNorm["y"]);
-    //obj1.velocity.y *= -this.restitution;
-    // inelastic collision
-
-    obj2["velocity"].x = 0;
-    obj2["velocity"].y = 0;
   }
 
   update(Canvas canvas, {double elapsedTime = 0.0, bool shouldUpdate = true}) {
@@ -286,19 +296,25 @@ class PhysicsBodySimple {
     // // apply physics
     var oldPos = Vector2(x: pos.x.toDouble(), y: pos.y.toDouble());
     velocity.x = damping * velocity.x;
+
+    // if (isCollidingAt == "none") {
     velocity.y = damping * velocity.y + gravity * gravityScale;
+    // }
 
-    if (isCollidingAt == "bottom") {
-      velocity.x = (velocity.x) * friction;
+    /// immovable objects don't move but do collide
+    if (immovable == true) {
+      velocity.x = 0;
+      velocity.y = 0;
+    } else {
+      pos = Vector2(x: pos.x + velocity.x, y: pos.y + velocity.y);
+
+      angle += angleVelocity *= angleDamping;
     }
-    pos = Vector2(
-        x: pos.x + damping * velocity.x,
-        y: pos.y + damping * velocity.y + gravity * gravityScale);
-
-    angle += angleVelocity *= angleDamping;
 
     /// RESET
     isCollidingAt = "none";
+
+    ///
 
     // if (!this.enablePhysicsSolver ||
     //     this.mass == 0) // do not update collision for fixed objects
@@ -372,9 +388,32 @@ class PhysicsBodySimple {
       String wallCollision = detectEdgeCollisions(this);
       if (wallCollision != "none") {
         isCollidingAt = wallCollision;
+
+        if (isCollidingAt == "bottom") {
+          velocity.x = (velocity.x) * friction;
+        }
         return;
       }
     }
+
+    if (collideSolidObjects) {
+      for (var item in world.getEngineObjectsCollide()) {
+        PhysicsBodySimple o = item.physicsBody;
+        //print("${o.immovable}, ${o.object.alive}, ${o.object.id}, ${this.object.id}");
+        // non solid objects don't collide with eachother
+        if (!immovable & !o.immovable ||
+            !o.object.alive ||
+            o.object.id == object.id) continue;
+
+        if (o.isCollidingAt == "none") {
+          calculatePhysicsCollision(this, o);
+        }
+      }
+
+      return;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
 
     if (collideSolidObjects) {
       // check collisions against solid objects

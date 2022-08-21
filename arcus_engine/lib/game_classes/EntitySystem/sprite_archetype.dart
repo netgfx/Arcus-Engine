@@ -27,6 +27,7 @@ mixin SpriteArchetype {
   int _zIndex = 0;
   bool _enablePhysics = false;
   PhysicsBodySimple? _physicsBody = null;
+  PhysicsBodyProperties physicsBodyProperties = PhysicsBodyProperties();
 
   // SpriteArchetype({
   //   required this.position,

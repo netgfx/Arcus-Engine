@@ -68,6 +68,10 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         texturePath: "assets/red.png",
       );
       cache.addItem(
+        "greyblock",
+        texturePath: "assets/grey.png",
+      );
+      cache.addItem(
         "boom",
         texturePath: "assets/boom.png",
         dataPath: "assets/boom.json",
@@ -132,11 +136,30 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         startAlive: true,
         fitParent: false,
         centerOffset: const Offset(0, 0),
+        onCollide: (obj) {
+          print("collision with: ${obj}");
+        },
         physicsProperties: PhysicsBodyProperties(
-          velocity: Vector2(x: 20, y: 0),
-          restitution: 0.30,
+          velocity: Vector2(x: 0, y: 20),
+          restitution: 0.3,
           friction: 0.95,
         ),
+      ),
+      Sprite(
+        position: const Point<double>(250.0, 600.0),
+        textureName: "greyblock",
+        scale: 0.30,
+        zIndex: 2,
+        enablePhysics: true,
+        startAlive: true,
+        fitParent: false,
+        centerOffset: const Offset(0, 0),
+        physicsProperties: PhysicsBodyProperties(
+            velocity: Vector2(x: 0, y: 0),
+            restitution: 0,
+            friction: 0.95,
+            mass: 10,
+            immovable: true),
       ),
       Sprite(
         position: const Point<double>(0.0, 0.0),

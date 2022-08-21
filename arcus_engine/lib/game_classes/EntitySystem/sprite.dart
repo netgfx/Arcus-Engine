@@ -30,8 +30,7 @@ class Sprite with SpriteArchetype {
   bool? startAlive = false;
   bool? _fitParent = true;
   Offset _centerOffset = Offset(0, 0);
-  Function? _onCollide = null;
-  PhysicsBodyProperties physicsBodyProperties = PhysicsBodyProperties();
+  Function? _onCollide;
 
   ///
   Sprite({
@@ -56,7 +55,7 @@ class Sprite with SpriteArchetype {
     this.scale = scale ?? 1.0;
     this.id = id ?? UniqueKey().toString();
     this.zIndex = zIndex ?? 0;
-    this.physicsBodyProperties = physicsProperties ?? PhysicsBodyProperties();
+    super.physicsBodyProperties = physicsProperties ?? PhysicsBodyProperties();
     if (startAlive == true) {
       alive = true;
     }
@@ -64,7 +63,7 @@ class Sprite with SpriteArchetype {
     this.enablePhysics = enablePhysics ?? false;
     if (this.enablePhysics == true) {
       setupPhysicsBody();
-      _onCollide = onCollide ?? () {};
+      _onCollide = onCollide;
     }
   }
 
