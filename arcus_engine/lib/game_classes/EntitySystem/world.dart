@@ -21,11 +21,8 @@ class TDWorld {
   }
 
   List<dynamic> getEngineObjectsCollide() {
-    return engineObjectsCollide = this
-        .displayList
-        .where((o) =>
-            o.physicsBody != null ? o.physicsBody.collideSolidObjects : false)
-        .toList();
+    return engineObjectsCollide =
+        this.displayList.where((o) => o.physicsBody != null).toList();
   }
 
   set cache(SpriteCache value) {

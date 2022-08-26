@@ -227,7 +227,9 @@ class PhysicsBodySimple {
       PhysicsBodySimple obj1, PhysicsBodySimple obj2) {
     String result = Utils.shared.getCollideSide(obj1, obj2);
     String result2 = Utils.shared.getCollideSide(obj2, obj1);
-    if (result != "none") {
+
+    if (result != "none" && result2 != "none") {
+      print("${obj1.immovable}, ${obj2.immovable}");
       //this.circleIntersect(obj1.x, obj1.y, obj1.getWidth(), obj2.x, obj2.y, obj2.getWidth())) {
       /// TODO: Detect specific collide point
       obj1.isCollidingAt = result2;
@@ -252,7 +254,7 @@ class PhysicsBodySimple {
           vRelativeVelocity["y"]! * vCollisionNorm["y"]!;
 
       // Apply restitution to the speed
-      speed *= min(obj1.restitution, obj2.restitution);
+      //speed *= min(obj1.restitution, obj2.restitution);
       //delayedPrint(speed.toString());
       if (speed < 0) {
         return;
@@ -298,7 +300,7 @@ class PhysicsBodySimple {
     velocity.x = damping * velocity.x;
 
     // if (isCollidingAt == "none") {
-    velocity.y = damping * velocity.y + gravity * gravityScale;
+    velocity.y = damping * velocity.y + gravity;
     // }
 
     /// immovable objects don't move but do collide
@@ -397,17 +399,16 @@ class PhysicsBodySimple {
     }
 
     if (collideSolidObjects) {
-      for (var item in world.getEngineObjectsCollide()) {
+      List<dynamic> items = world.getEngineObjectsCollide();
+      for (var item in items) {
         PhysicsBodySimple o = item.physicsBody;
         //print("${o.immovable}, ${o.object.alive}, ${o.object.id}, ${this.object.id}");
         // non solid objects don't collide with eachother
-        if (!immovable & !o.immovable ||
-            !o.object.alive ||
-            o.object.id == object.id) continue;
+        if (!o.object.alive || o.object.id == object.id) continue;
 
-        if (o.isCollidingAt == "none") {
-          calculatePhysicsCollision(this, o);
-        }
+        //if (o.isCollidingAt == "none") {
+        calculatePhysicsCollision(this, o);
+        //}
       }
 
       return;
