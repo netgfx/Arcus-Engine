@@ -63,16 +63,19 @@ class SpriteAnimator with SpriteArchetype {
   }
 
   @override
-  void update(Canvas canvas,
-      {double elapsedTime = 0.0, bool shouldUpdate = true}) {
+  void update(
+    Canvas canvas, {
+    double elapsedTime = 0.0,
+    double timestamp = 0.0,
+    bool shouldUpdate = true,
+  }) {
     if (alive == true) {
       if (this.texture == null) {
         setCache();
       }
       var img = spriteData[currentFrame]![currentIndex];
-      Point<double> pos = Point(
-          position.x - img["width"].toDouble() * scale * _centerOffset.dx,
-          position.y - img["height"].toDouble() * scale * _centerOffset.dy);
+      Point<double> pos =
+          Point(position.x - img["width"].toDouble() * scale * _centerOffset.dx, position.y - img["height"].toDouble() * scale * _centerOffset.dy);
 
       /// this component needs its own tick
       if (elapsedTime - this.currentTime >= timeDecay) {
@@ -97,13 +100,11 @@ class SpriteAnimator with SpriteArchetype {
     }
   }
 
-  void renderSprite(
-      Canvas canvas, Point<double> pos, Map<String, dynamic> img) {
+  void renderSprite(Canvas canvas, Point<double> pos, Map<String, dynamic> img) {
     updateCanvas(canvas, pos.x, pos.y, scale, () {
       canvas.drawImageRect(
         this.texture!,
-        Rect.fromLTWH(img["x"].toDouble(), img["y"].toDouble(),
-            img["width"].toDouble(), img["height"].toDouble()),
+        Rect.fromLTWH(img["x"].toDouble(), img["y"].toDouble(), img["width"].toDouble(), img["height"].toDouble()),
         Rect.fromLTWH(
           0,
           0,
@@ -116,14 +117,12 @@ class SpriteAnimator with SpriteArchetype {
   }
 
   void setCache() {
-    Map<String, dynamic>? cacheItem =
-        GameObject.shared.getSpriteCache().getItem(textureName);
+    Map<String, dynamic>? cacheItem = GameObject.shared.getSpriteCache().getItem(textureName);
     if (cacheItem != null) {
       this.texture = cacheItem["texture"];
       this.spriteData = cacheItem["spriteData"];
       var img = spriteData[currentFrame]![currentIndex];
-      this.size = Size(img["width"].toDouble() * this.scale,
-          img["height"].toDouble() * this.scale);
+      this.size = Size(img["width"].toDouble() * this.scale, img["height"].toDouble() * this.scale);
     }
   }
 
@@ -133,8 +132,7 @@ class SpriteAnimator with SpriteArchetype {
 
   Point<double> getPosition() {
     var img = spriteData[currentFrame]![currentIndex];
-    Point<double> pos = Point(position.x - img["width"].toDouble() * scale / 2,
-        position.y - img["height"].toDouble() * scale / 2);
+    Point<double> pos = Point(position.x - img["width"].toDouble() * scale / 2, position.y - img["height"].toDouble() * scale / 2);
     return pos;
   }
 

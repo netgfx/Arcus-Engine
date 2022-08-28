@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
+import 'package:arcus_engine/helpers/constants.dart';
 import 'package:arcus_engine/helpers/utils.dart';
 
 class PhysicsBodyProperties {
@@ -106,7 +107,6 @@ class PhysicsBodySimple {
   bool collideTiles = true;
   double _angle = 0.0;
   double objectMaxSpeed = 10.0;
-  double gravity = 1.81;
   dynamic groundObject;
   bool enablePhysicsSolver = true;
   TDWorld world;
@@ -169,8 +169,7 @@ class PhysicsBodySimple {
     return object;
   }
 
-  setCollision(
-      {collideSolidObjects = false, isSolid = false, collideTiles = true}) {
+  setCollision({collideSolidObjects = false, isSolid = false, collideTiles = true}) {
     //ASSERT(collideSolidObjects || !isSolid); // solid objects must be set to collide
 
     this.collideSolidObjects = collideSolidObjects;
@@ -223,38 +222,25 @@ class PhysicsBodySimple {
   }
 
   /// TODO: needs rework
-  void calculatePhysicsCollision(
-      PhysicsBodySimple obj1, PhysicsBodySimple obj2) {
+  void calculatePhysicsCollision(PhysicsBodySimple obj1, PhysicsBodySimple obj2) {
     String result = Utils.shared.getCollideSide(obj1, obj2);
     String result2 = Utils.shared.getCollideSide(obj2, obj1);
 
     if (result != "none" && result2 != "none") {
-      print("${obj1.immovable}, ${obj2.immovable}");
+      //print("${obj1.immovable}, ${obj2.immovable}");
       //this.circleIntersect(obj1.x, obj1.y, obj1.getWidth(), obj2.x, obj2.y, obj2.getWidth())) {
       /// TODO: Detect specific collide point
       obj1.isCollidingAt = result2;
       obj2.isCollidingAt = result;
 
-      Map<String, double> vCollision = {
-        "x": obj2.pos.x - obj1.pos.x,
-        "y": obj2.pos.y - obj1.pos.y
-      };
-      double distance = sqrt(
-          (obj2.pos.x - obj1.pos.x) * (obj2.pos.x - obj1.pos.x) +
-              (obj2.pos.y - obj1.pos.y) * (obj2.pos.y - obj1.pos.y));
-      Map<String, double> vCollisionNorm = {
-        "x": vCollision["x"]! / distance,
-        "y": vCollision["y"]! / distance
-      };
-      var vRelativeVelocity = {
-        "x": obj1.velocity.x - obj2.velocity.x,
-        "y": obj1.velocity.y - obj2.velocity.y
-      };
-      var speed = vRelativeVelocity["x"]! * vCollisionNorm["x"]! +
-          vRelativeVelocity["y"]! * vCollisionNorm["y"]!;
+      Map<String, double> vCollision = {"x": obj2.pos.x - obj1.pos.x, "y": obj2.pos.y - obj1.pos.y};
+      double distance = sqrt((obj2.pos.x - obj1.pos.x) * (obj2.pos.x - obj1.pos.x) + (obj2.pos.y - obj1.pos.y) * (obj2.pos.y - obj1.pos.y));
+      Map<String, double> vCollisionNorm = {"x": vCollision["x"]! / distance, "y": vCollision["y"]! / distance};
+      var vRelativeVelocity = {"x": obj1.velocity.x - obj2.velocity.x, "y": obj1.velocity.y - obj2.velocity.y};
+      var speed = vRelativeVelocity["x"]! * vCollisionNorm["x"]! + vRelativeVelocity["y"]! * vCollisionNorm["y"]!;
 
       // Apply restitution to the speed
-      //speed *= min(obj1.restitution, obj2.restitution);
+      speed *= min(obj1.restitution, obj2.restitution);
       //delayedPrint(speed.toString());
       if (speed < 0) {
         return;
@@ -275,10 +261,14 @@ class PhysicsBodySimple {
       } else if (obj1.immovable == true) {
         obj1.velocity.y = 0;
       }
+
+      // if (obj1.immovable == false) {
+      //   print(obj1.velocity);
+      // }
     }
   }
 
-  update(Canvas canvas, {double elapsedTime = 0.0, bool shouldUpdate = true}) {
+  update(Canvas canvas, {double elapsedTime = 0.0, double timestamp = 0.0, bool shouldUpdate = true}) {
     // var parent = this.object;
     // if (parent) {
     //   // copy parent pos/angle
@@ -297,10 +287,11 @@ class PhysicsBodySimple {
 
     // // apply physics
     var oldPos = Vector2(x: pos.x.toDouble(), y: pos.y.toDouble());
-    velocity.x = damping * velocity.x;
+    //velocity.x += gravity * elapsedTime;
 
     // if (isCollidingAt == "none") {
-    velocity.y = damping * velocity.y + gravity;
+    velocity.y += gravity * timestamp;
+    //damping *
     // }
 
     /// immovable objects don't move but do collide
@@ -308,7 +299,7 @@ class PhysicsBodySimple {
       velocity.x = 0;
       velocity.y = 0;
     } else {
-      pos = Vector2(x: pos.x + velocity.x, y: pos.y + velocity.y);
+      pos = Vector2(x: oldPos.x + velocity.x * timestamp, y: oldPos.y + velocity.y * timestamp);
 
       angle += angleVelocity *= angleDamping;
     }
@@ -406,6 +397,18 @@ class PhysicsBodySimple {
         // non solid objects don't collide with eachother
         if (!o.object.alive || o.object.id == object.id) continue;
 
+        // if (Utils.shared.isOverlapping(oldPos, this.size, o.pos, o.size)) {
+        //   // if already was touching, try to push away
+        //   var sizeBoth = this.size.add(o.size);
+        //   if (this.immovable == false) {
+        //     //this.pos.y = (o.pos.y - this.size.y).abs();
+
+        //     //this.velocity.y *= -this.elasticity;
+        //   }
+        //   //obj.pos.y = worldBounds.height - (obj.size.y);
+        //   //continue;
+        // }
+
         //if (o.isCollidingAt == "none") {
         calculatePhysicsCollision(this, o);
         //}
@@ -415,106 +418,5 @@ class PhysicsBodySimple {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-
-    if (collideSolidObjects) {
-      // check collisions against solid objects
-
-      for (var item in world.getEngineObjectsCollide()) {
-        var o = item.physicsBody;
-        //print("${o.immovable}, ${o.object.alive}, ${o.object.id}, ${this.object.id}");
-        // non solid objects don't collide with eachother
-        if (!immovable & !o.immovable ||
-            !o.object.alive ||
-            o.object.id == object.id) continue;
-
-        // check collision
-        if (!Utils.shared.isOverlapping(pos, size, o.pos, o.size)) continue;
-
-        // pass collision to objects
-        object.collideWithObject(o);
-        o.object.collideWithObject(this);
-
-        if (Utils.shared.isOverlapping(oldPos, size, o.pos, o.size)) {
-          // if already was touching, try to push away
-          var deltaPos = Utils.shared.subtract(oldPos, o.pos);
-          var length = deltaPos.length();
-          const pushAwayAccel = .001; // push away if already overlapping
-          var velocity = length < .01
-              ? Utils.shared.randVector(length: pushAwayAccel)
-              : deltaPos.scale(pushAwayAccel / length);
-          this.velocity = this.velocity.add(velocity);
-          if (o.mass) // push away if not fixed
-            o.velocity = o.velocity.subtract(velocity);
-
-          //debugOverlay && debugPhysics && debugAABB(this.pos, this.size, o.pos, o.size, '#f00');
-          continue;
-        }
-
-        // check for collision
-        var sizeBoth = size.add(o.size);
-        var smallStepUp = (oldPos.y - o.pos.y) * 2 >
-            sizeBoth.y + gravity; // prefer to push up if small delta
-        var isBlockedX = (oldPos.y - o.pos.y).abs() * 2 < sizeBoth.y;
-        var isBlockedY = (oldPos.x - o.pos.x).abs() * 2 < sizeBoth.x;
-
-        if (smallStepUp || isBlockedY || !isBlockedX) {
-          // push outside object collision
-          pos.y = o.pos.y +
-              (sizeBoth.y / 2 + epsilon) *
-                  Utils.shared.sign(oldPos.y - o.pos.y);
-          if (o.groundObject != null && wasMovingDown || !o.mass) {
-            // set ground object if landed on something
-            if (wasMovingDown) groundObject = o;
-
-            // bounce if other object is fixed or grounded
-            velocity.y *= -elasticity;
-          } else if (o.mass != null) {
-            // inelastic collision
-            var inelastic =
-                (mass * velocity.y + o.mass * o.velocity.y) / (mass + o.mass);
-
-            // elastic collision
-            var elastic0 = velocity.y * (mass - o.mass) / (mass + o.mass) +
-                o.velocity.y * 2 * o.mass / (mass + o.mass);
-            var elastic1 = o.velocity.y * (o.mass - mass) / (mass + o.mass) +
-                velocity.y * 2 * mass / (mass + o.mass);
-
-            // lerp betwen elastic or inelastic based on elasticity
-            var elasticity = max(this.elasticity, o.elasticity as double);
-            velocity.y =
-                Utils.shared.lerp(elasticity, min: inelastic, max: elastic0);
-            o.velocity.y =
-                Utils.shared.lerp(elasticity, min: inelastic, max: elastic1);
-          }
-        }
-        if (!smallStepUp && (isBlockedX || !isBlockedY)) // resolve x collision
-        {
-          // push outside collision
-          pos.x = o.pos.x +
-              (sizeBoth.x / 2 + epsilon) *
-                  Utils.shared.sign(oldPos.x - o.pos.x);
-          if (o.mass) {
-            // inelastic collision
-            var inelastic =
-                (mass * velocity.x + o.mass * o.velocity.x) / (mass + o.mass);
-
-            // elastic collision
-            var elastic0 = velocity.x * (mass - o.mass) / (mass + o.mass) +
-                o.velocity.x * 2 * o.mass / (mass + o.mass);
-            var elastic1 = o.velocity.x * (o.mass - mass) / (mass + o.mass) +
-                velocity.x * 2 * mass / (mass + o.mass);
-
-            // lerp betwen elastic or inelastic based on elasticity
-            var elasticity = max(this.elasticity, o.elasticity as double);
-            velocity.x =
-                Utils.shared.lerp(elasticity, min: inelastic, max: elastic0);
-            o.velocity.x =
-                Utils.shared.lerp(elasticity, min: inelastic, max: elastic1);
-          } else // bounce if other object is fixed
-            velocity.x *= -elasticity;
-        }
-        //debugOverlay && debugPhysics && debugAABB(this.pos, this.size, o.pos, o.size, '#f0f');
-      }
-    }
   }
 }

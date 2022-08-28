@@ -48,8 +48,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tween = TweenManager(ticker: this);
-    _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _controller = AnimationController(vsync: this, duration: Duration(seconds: 1));
     //_spriteController = AnimationController(vsync: this, duration: Duration(seconds: 1));
     //_controller.addListener(() {setState(() {});}); no need to setState
     //_controller.drive(CurveTween(curve: Curves.bounceIn));
@@ -140,8 +139,8 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
           print("collision with: ${obj}");
         },
         physicsProperties: PhysicsBodyProperties(
-          velocity: Vector2(x: 0, y: 20),
-          restitution: 0.3,
+          velocity: Vector2(x: 0, y: 0),
+          restitution: 0.6,
           friction: 0.95,
         ),
       ),
@@ -154,12 +153,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         startAlive: true,
         fitParent: false,
         centerOffset: const Offset(0, 0),
-        physicsProperties: PhysicsBodyProperties(
-            velocity: Vector2(x: 0, y: 0),
-            restitution: 0,
-            friction: 0.95,
-            mass: 10,
-            immovable: true),
+        physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 10, immovable: true),
       ),
       Sprite(
         position: const Point<double>(0.0, 0.0),
@@ -266,8 +260,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
           //         ),
           //       )),
           // ),
-          body: LayoutBuilder(builder:
-              (BuildContext context, BoxConstraints viewportConstraints) {
+          body: LayoutBuilder(builder: (BuildContext context, BoxConstraints viewportConstraints) {
             this.viewportConstraints = viewportConstraints;
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
@@ -301,10 +294,8 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
                                     viewportConstraints.maxWidth,
                                     viewportConstraints.maxHeight,
                                   ),
-                                  mapSize: Size(viewportConstraints.maxWidth,
-                                      viewportConstraints.maxHeight),
-                                  followObject:
-                                      Rect.fromLTWH(200.0, 180.0, 80, 80),
+                                  mapSize: Size(viewportConstraints.maxWidth, viewportConstraints.maxHeight),
+                                  followObject: Rect.fromLTWH(200.0, 180.0, 80, 80),
                                   offset: Point<double>(0.0, 0.0),
                                 ),
                               ),

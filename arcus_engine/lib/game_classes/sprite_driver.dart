@@ -30,6 +30,7 @@ class SpriteDriverCanvas extends CustomPainter {
   Canvas? canvas;
   int delay = 500;
   int currentTime = 0;
+  int oldTimestamp = 0;
   int fps = 24;
   int printTime = DateTime.now().millisecondsSinceEpoch;
   int timeDecay = 0;
@@ -45,8 +46,7 @@ class SpriteDriverCanvas extends CustomPainter {
   Function? update;
   Paint _paint = new Paint();
   List<TDEnemy> enemies = [];
-  BoxConstraints sceneSize = BoxConstraints(
-      minWidth: 800, maxWidth: 1600, minHeight: 450, maxHeight: 900);
+  BoxConstraints sceneSize = BoxConstraints(minWidth: 800, maxWidth: 1600, minHeight: 450, maxHeight: 900);
 
   ActionManager? actions;
   SpriteCache cache;
@@ -79,13 +79,11 @@ class SpriteDriverCanvas extends CustomPainter {
     this.cameraProps = cameraProps;
 
     /// calculate world bounds
-    this.worldBounds =
-        Rectangle(x: 0, y: 0, width: this.width, height: this.height);
+    this.worldBounds = Rectangle(x: 0, y: 0, width: this.width, height: this.height);
 
     if (this._world == null) {
       this._world = TDWorld();
-      this._world!.worldBounds =
-          Size(this.worldBounds.width, this.worldBounds.height);
+      this._world!.worldBounds = Size(this.worldBounds.width, this.worldBounds.height);
       this._world!.displayList = this.sprites;
       GameObject.shared.setWorld(this._world!);
     }
@@ -97,8 +95,7 @@ class SpriteDriverCanvas extends CustomPainter {
           x: 0,
           y: 0,
           cameraProps: this.cameraProps!,
-          offset: Point<double>(
-              this.cameraProps!.offset.x, this.cameraProps!.offset.y),
+          offset: Point<double>(this.cameraProps!.offset.x, this.cameraProps!.offset.y),
         );
       }
     }
@@ -133,29 +130,30 @@ class SpriteDriverCanvas extends CustomPainter {
       if (this.controller!.lastElapsedDuration != null) {
         // camera
         if (_camera != null) {
-          canvas.clipRect(Rect.fromLTWH(
-              this.cameraProps!.offset.x,
-              this.cameraProps!.offset.y,
-              _camera!.getCameraBounds().width,
-              _camera!.getCameraBounds().height));
+          canvas.clipRect(
+              Rect.fromLTWH(this.cameraProps!.offset.x, this.cameraProps!.offset.y, _camera!.getCameraBounds().width, _camera!.getCameraBounds().height));
           //Rect bounds = _camera!.getCameraBounds();
         }
+        var lastElapsed = (controller!.lastElapsedDuration!.inMilliseconds - oldTimestamp) / 1000;
+        oldTimestamp = controller!.lastElapsedDuration!.inMilliseconds;
 
         /// in order to run in our required frames per second
-        if (this.controller!.lastElapsedDuration!.inMilliseconds -
-                this.currentTime >=
-            timeDecay) {
+        if (this.controller!.lastElapsedDuration!.inMilliseconds - this.currentTime >= timeDecay) {
           /// reset the time
 
-          this.currentTime =
-              this.controller!.lastElapsedDuration!.inMilliseconds;
+          this.currentTime = this.controller!.lastElapsedDuration!.inMilliseconds;
+
           var results = [];
           for (var sprite in this.sprites) {
             if (sprite.alive == true) {
               //depth sort
               this.depthSort();
               // update
-              sprite.update(canvas, elapsedTime: this.currentTime.toDouble());
+              sprite.update(
+                canvas,
+                elapsedTime: this.currentTime.toDouble(),
+                timestamp: lastElapsed,
+              );
               // check for events
               if (this.shouldCheckEvent == true) {
                 if (sprite.interactive == true) {
@@ -193,9 +191,12 @@ class SpriteDriverCanvas extends CustomPainter {
               //depth sort
               this.depthSort();
               // update
-              item.update(canvas,
-                  elapsedTime: this.currentTime.toDouble(),
-                  shouldUpdate: false);
+              item.update(
+                canvas,
+                elapsedTime: this.currentTime.toDouble(),
+                timestamp: lastElapsed,
+                shouldUpdate: false,
+              );
             }
           }
         }
@@ -231,8 +232,7 @@ class SpriteDriverCanvas extends CustomPainter {
       String frame = event["frame"];
       //get a non alive sprite to re-use
       var sprite = this.sprites.cast<SpriteArchetype?>().firstWhere((element) {
-        bool result =
-            (element!.alive == false) && (element.textureName == spriteName);
+        bool result = (element!.alive == false) && (element.textureName == spriteName);
         return result;
       }, orElse: () => null);
       if (sprite != null) {
@@ -254,8 +254,7 @@ class SpriteDriverCanvas extends CustomPainter {
   /**
    *  Append a new sprite object
    */
-  void addSpriteByType(
-      String type, Point<double> coords, String name, String frame) {
+  void addSpriteByType(String type, Point<double> coords, String name, String frame) {
     if (type == "TDSpriteAnimator") {
       this.sprites.add(SpriteAnimator(
             position: coords,

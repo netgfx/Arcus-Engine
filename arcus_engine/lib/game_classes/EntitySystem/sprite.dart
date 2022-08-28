@@ -103,8 +103,12 @@ class Sprite with SpriteArchetype {
   }
 
   @override
-  void update(Canvas canvas,
-      {double elapsedTime = 0, bool shouldUpdate = true}) {
+  void update(
+    Canvas canvas, {
+    double elapsedTime = 0,
+    double timestamp = 0.0,
+    bool shouldUpdate = true,
+  }) {
     if (texture == null) {
       setCache();
     }
@@ -114,8 +118,12 @@ class Sprite with SpriteArchetype {
       setupPhysicsBody();
     }
     if (physicsBody != null) {
-      physicsBody!
-          .update(canvas, elapsedTime: elapsedTime, shouldUpdate: shouldUpdate);
+      physicsBody!.update(
+        canvas,
+        elapsedTime: elapsedTime,
+        timestamp: timestamp,
+        shouldUpdate: shouldUpdate,
+      );
 
       /// apply the physics pos to the actual object
       position = Point(physicsBody!.pos.x, physicsBody!.pos.y);
@@ -137,10 +145,8 @@ class Sprite with SpriteArchetype {
         if (GameObject.shared.world != null) {
           Size bounds = GameObject.shared.getWorld()!.worldBounds;
           final FittedSizes sizes = applyBoxFit(BoxFit.cover, size, bounds);
-          final Rect inputSubrect =
-              Alignment.center.inscribe(sizes.source, Offset.zero & size);
-          final Rect outputSubrect = Alignment.center
-              .inscribe(sizes.destination, Offset.zero & bounds);
+          final Rect inputSubrect = Alignment.center.inscribe(sizes.source, Offset.zero & size);
+          final Rect outputSubrect = Alignment.center.inscribe(sizes.destination, Offset.zero & bounds);
           canvas.drawImageRect(texture!, inputSubrect, outputSubrect, paint);
         }
       });
@@ -170,8 +176,7 @@ class Sprite with SpriteArchetype {
   }
 
   void setCache() {
-    Map<String, dynamic>? cacheItem =
-        GameObject.shared.getSpriteCache().getItem(textureName);
+    Map<String, dynamic>? cacheItem = GameObject.shared.getSpriteCache().getItem(textureName);
     if (cacheItem != null) {
       texture = cacheItem["texture"];
       textureWidth = cacheItem["textureWidth"];
@@ -184,14 +189,12 @@ class Sprite with SpriteArchetype {
 
   Rectangle getRect() {
     Size _size = getSize();
-    return Rectangle(
-        x: position.x, y: position.y, width: _size.width, height: _size.height);
+    return Rectangle(x: position.x, y: position.y, width: _size.width, height: _size.height);
   }
 
   Rectangle getBounds() {
     Size _size = getSize();
-    return Rectangle(
-        x: position.x, y: position.y, width: _size.width, height: _size.height);
+    return Rectangle(x: position.x, y: position.y, width: _size.width, height: _size.height);
   }
 
   ui.Image? get textureImage {
