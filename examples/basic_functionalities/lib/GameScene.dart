@@ -136,7 +136,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         fitParent: false,
         centerOffset: const Offset(0, 0),
         onCollide: (obj) {
-          print("collision with: ${obj}");
+          //print("collision with: ${obj}");
         },
         physicsProperties: PhysicsBodyProperties(
           velocity: Vector2(x: 0, y: 0),

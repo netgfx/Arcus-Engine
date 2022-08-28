@@ -228,7 +228,19 @@ class PhysicsBodySimple {
 
     if (result != "none" && result2 != "none") {
       //print("${obj1.immovable}, ${obj2.immovable}");
-      //this.circleIntersect(obj1.x, obj1.y, obj1.getWidth(), obj2.x, obj2.y, obj2.getWidth())) {
+
+      Vector2 sizeBoth = obj1.size.add(obj2.size);
+      //Vector2(x: size.x + obj2.size.x, y: size.y + obj2.size.y);
+      var smallStepUp = (obj1.pos.y - obj2.pos.y) * 2 > sizeBoth.y + gravity; // prefer to push up if small delta
+      //const isBlockedX = abs(oldPos.y - o.pos.y)*2 < sizeBoth.y;
+      var isBlockedY = (obj1.pos.y - obj2.pos.y).abs() * 2 < sizeBoth.y;
+
+      if ((smallStepUp || isBlockedY) && obj1.immovable == false) {
+        // push outside object collision
+        obj1.pos.y = obj2.pos.y + (sizeBoth.y / 2 + epsilon) * Utils.shared.sign(obj1.pos.y - obj2.pos.y);
+      }
+      print(obj1.pos.y);
+
       /// TODO: Detect specific collide point
       obj1.isCollidingAt = result2;
       obj2.isCollidingAt = result;
@@ -314,19 +326,9 @@ class PhysicsBodySimple {
     //   return;
 
     var wasMovingDown = velocity.y < 0;
-    // if (this.groundObject != null) {
-    //   // apply friction in local space of ground object
-    //   var groundSpeed = this.groundObject!["velocity"] != null
-    //       ? this.groundObject!["velocity"].x
-    //       : 0;
-    //   this.velocity.x =
-    //       groundSpeed + (this.velocity.x - groundSpeed) * this.friction;
-    //   this.groundObject = null;
-    // }
 
     /// add world collision
     Size worldBounds = world.worldBounds;
-    const epsilon = 1e-3; // necessary to push slightly outside of the collision
     if (collideWorldBounds) {
       Map<String, Map<String, dynamic>> bounds = {
         /// top
@@ -397,21 +399,12 @@ class PhysicsBodySimple {
         // non solid objects don't collide with eachother
         if (!o.object.alive || o.object.id == object.id) continue;
 
-        // if (Utils.shared.isOverlapping(oldPos, this.size, o.pos, o.size)) {
-        //   // if already was touching, try to push away
-        //   var sizeBoth = this.size.add(o.size);
-        //   if (this.immovable == false) {
-        //     //this.pos.y = (o.pos.y - this.size.y).abs();
+        if (o.immovable == true) {
+          o.velocity.y = 0;
+          continue;
+        }
 
-        //     //this.velocity.y *= -this.elasticity;
-        //   }
-        //   //obj.pos.y = worldBounds.height - (obj.size.y);
-        //   //continue;
-        // }
-
-        //if (o.isCollidingAt == "none") {
         calculatePhysicsCollision(this, o);
-        //}
       }
 
       return;
