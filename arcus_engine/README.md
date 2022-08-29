@@ -31,12 +31,12 @@
 - Pooling 🚩
 - port Arcade physics ❗
   - Simple physics 🏭
-  - generalize the collision
+  - generalize the collision 🏭
   - fix collide with bounds ✔️
 - create master Sprite class for all game objects to inherit basic properties via mixin ✔️
 - cache ✔️
 - loader class for all assets ✔️
-- audio (https://pub.dev/packages/audioplayers)
+- audio (https://pub.dev/packages/just_audio)
 - Shapes ✔️
 - Group component 🏭
 - Plugin template 🏭

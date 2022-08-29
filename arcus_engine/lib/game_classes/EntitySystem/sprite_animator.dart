@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
@@ -29,9 +32,11 @@ class SpriteAnimator with SpriteArchetype {
   int textureWidth = 0;
   int textureHeight = 0;
   Paint _paint = new Paint();
+  TDWorld? world = GameObject.shared.getWorld();
   bool? startAlive = false;
   int timeDecay = 0;
   Offset _centerOffset = Offset(0, 0);
+  Function? _onCollide;
 
   // constructor
   SpriteAnimator({
@@ -47,6 +52,9 @@ class SpriteAnimator with SpriteArchetype {
     onEvent,
     id,
     centerOffset,
+    enablePhysics,
+    physicsProperties,
+    onCollide,
   }) {
     this.position = position ?? Point(0.0, 0.0);
     this._centerOffset = centerOffset ?? Offset(0, 0);
@@ -57,8 +65,14 @@ class SpriteAnimator with SpriteArchetype {
     this.timeDecay = (1 / (this.fps ?? 60) * 1000).round();
     this.scale = scale ?? 1.0;
     this.id = id ?? UniqueKey().toString();
-    if (this.startAlive == true) {
-      this.alive = true;
+    super.physicsBodyProperties = physicsProperties ?? PhysicsBodyProperties();
+    if (startAlive == true) {
+      alive = true;
+    }
+    this.enablePhysics = enablePhysics ?? false;
+    if (this.enablePhysics == true) {
+      setupPhysicsBody();
+      _onCollide = onCollide;
     }
   }
 
@@ -76,6 +90,22 @@ class SpriteAnimator with SpriteArchetype {
       var img = spriteData[currentFrame]![currentIndex];
       Point<double> pos =
           Point(position.x - img["width"].toDouble() * scale * _centerOffset.dx, position.y - img["height"].toDouble() * scale * _centerOffset.dy);
+
+      /// Physics
+      if (enablePhysics == true && physicsBody == null) {
+        setupPhysicsBody();
+      }
+      if (physicsBody != null) {
+        physicsBody!.update(
+          canvas,
+          elapsedTime: elapsedTime,
+          timestamp: timestamp,
+          shouldUpdate: shouldUpdate,
+        );
+
+        /// apply the physics pos to the actual object
+        position = Point(physicsBody!.pos.x, physicsBody!.pos.y);
+      }
 
       /// this component needs its own tick
       if (elapsedTime - this.currentTime >= timeDecay) {
@@ -97,6 +127,21 @@ class SpriteAnimator with SpriteArchetype {
       } else {
         renderSprite(canvas, pos, img);
       }
+    }
+  }
+
+  ///
+  setupPhysicsBody() {
+    world = GameObject.shared.getWorld();
+    if (world != null) {
+      physicsBody = PhysicsBodySimple(
+        object: this,
+        pos: Vector2(x: position.x, y: position.y),
+        world: world!,
+        size: Vector2(x: size.width, y: size.height),
+        physicsProperties: this.physicsBodyProperties,
+        onCollision: onCollide,
+      );
     }
   }
 

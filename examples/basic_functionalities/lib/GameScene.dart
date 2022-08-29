@@ -194,9 +194,10 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         interactive: true,
       ),
       ShapeMaker(
-        type: ShapeType.Circle,
-        position: Point<double>(200.0, 250.0),
-        radius: 40,
+        type: ShapeType.Rect,
+        position: const Point<double>(200.0, 250.0),
+        radius: 20,
+        size: const Size(300, 10),
         zIndex: 1,
         interactive: false,
         paintOptions: {
@@ -204,6 +205,8 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
           "paintingStyle": ui.PaintingStyle.fill,
         },
         startAlive: true,
+        enablePhysics: true,
+        physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 1000, immovable: true),
       ),
       group
     ];

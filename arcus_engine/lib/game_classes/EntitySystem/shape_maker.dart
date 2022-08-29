@@ -1,11 +1,14 @@
 import "dart:math";
 import "dart:ui";
 
+import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
+import 'package:arcus_engine/helpers/GameObject.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
-import 'package:vector_math/vector_math_64.dart';
+import 'package:vector_math/vector_math.dart' as vectorMath;
 
 enum ShapeType {
   Circle,
@@ -41,8 +44,25 @@ class ShapeMaker {
   String _id = "";
   dynamic _physicsBody = null;
   bool enablePhysics = false;
+  TDWorld? world = GameObject.shared.getWorld();
+  PhysicsBodyProperties physicsBodyProperties = PhysicsBodyProperties();
+  Function? _onCollide;
 
-  ShapeMaker({required this.type, size, radius, position, angle, paintOptions, startAlive, id, zIndex, interactive, enablePhysics, physicsBody}) {
+  ShapeMaker({
+    required this.type,
+    size,
+    radius,
+    position,
+    angle,
+    paintOptions,
+    startAlive,
+    id,
+    zIndex,
+    interactive,
+    enablePhysics,
+    physicsProperties,
+    onCollide,
+  }) {
     this.size = size ?? Size(20, 20);
     this._color = Color.fromARGB(255, 0, 0, 0);
     this.radius = radius.toDouble() ?? 50.0;
@@ -66,6 +86,17 @@ class ShapeMaker {
         ..color = this._color
         ..style = PaintingStyle.fill;
     }
+
+    physicsBodyProperties = physicsProperties ?? PhysicsBodyProperties();
+    if (startAlive == true) {
+      alive = true;
+    }
+
+    this.enablePhysics = enablePhysics ?? false;
+    if (this.enablePhysics == true) {
+      setupPhysicsBody();
+      _onCollide = onCollide;
+    }
   }
 
   void update(
@@ -74,7 +105,42 @@ class ShapeMaker {
     double timestamp = 0.0,
     bool shouldUpdate = true,
   }) {
-    drawType(canvas, this.type);
+    /// Physics
+    if (enablePhysics == true && physicsBody == null) {
+      setupPhysicsBody();
+    }
+    if (physicsBody != null) {
+      physicsBody!.update(
+        canvas,
+        elapsedTime: elapsedTime,
+        timestamp: timestamp,
+        shouldUpdate: shouldUpdate,
+      );
+
+      /// apply the physics pos to the actual object
+      position = Point(physicsBody!.pos.x, physicsBody!.pos.y);
+    }
+
+    drawType(canvas, type);
+  }
+
+  ///
+  setupPhysicsBody() {
+    world = GameObject.shared.getWorld();
+    if (world != null) {
+      physicsBody = PhysicsBodySimple(
+        object: this,
+        pos: Vector2(x: position.x, y: position.y),
+        world: world!,
+        size: Vector2(x: size.width, y: size.height),
+        physicsProperties: physicsBodyProperties,
+        onCollision: _onCollide,
+      );
+    }
+  }
+
+  bool onCollide(dynamic item) {
+    return true;
   }
 
   void drawType(Canvas canvas, ShapeType type) {
@@ -144,7 +210,7 @@ class ShapeMaker {
     updateCanvas(canvas, 0, 0, 0, () {
       final Path path = Path();
       for (int i = 0; i < num; i++) {
-        final double radian = radians(initialAngle + 360 / num * i.toDouble());
+        final double radian = vectorMath.radians(initialAngle + 360 / num * i.toDouble());
         final double x = radius * cos(radian);
         final double y = radius * sin(radian);
         if (i == 0) {
@@ -154,7 +220,7 @@ class ShapeMaker {
         }
       }
       path.close();
-      canvas.drawPath(path, this.paint);
+      canvas.drawPath(path, paint);
     });
   }
 
@@ -175,7 +241,7 @@ class ShapeMaker {
     updateCanvas(canvas, 0, 0, 0, () {
       final Path path = Path();
       for (int i = 0; i < num; i++) {
-        final double radian = radians(initialAngle + 360 / num * i.toDouble());
+        final double radian = vectorMath.radians(initialAngle + 360 / num * i.toDouble());
         final double x = radius * (i.isEven ? 0.5 : 1) * cos(radian);
         final double y = radius * (i.isEven ? 0.5 : 1) * sin(radian);
         if (i == 0) {

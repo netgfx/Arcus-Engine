@@ -227,19 +227,15 @@ class PhysicsBodySimple {
     String result2 = Utils.shared.getCollideSide(obj2, obj1);
 
     if (result != "none" && result2 != "none") {
-      //print("${obj1.immovable}, ${obj2.immovable}");
+      if (Utils.shared.isOverlapping(obj1.pos, obj1.size, obj2.pos, obj2.size)) {
+        // perhaps needed elsewhere?
+      }
 
       Vector2 sizeBoth = obj1.size.add(obj2.size);
-      //Vector2(x: size.x + obj2.size.x, y: size.y + obj2.size.y);
-      var smallStepUp = (obj1.pos.y - obj2.pos.y) * 2 > sizeBoth.y + gravity; // prefer to push up if small delta
-      //const isBlockedX = abs(oldPos.y - o.pos.y)*2 < sizeBoth.y;
-      var isBlockedY = (obj1.pos.y - obj2.pos.y).abs() * 2 < sizeBoth.y;
-
-      if ((smallStepUp || isBlockedY) && obj1.immovable == false) {
+      if (checkIfBlocked(obj1, obj2) && obj1.immovable == false) {
         // push outside object collision
         obj1.pos.y = obj2.pos.y + (sizeBoth.y / 2 + epsilon) * Utils.shared.sign(obj1.pos.y - obj2.pos.y);
       }
-      print(obj1.pos.y);
 
       /// TODO: Detect specific collide point
       obj1.isCollidingAt = result2;
@@ -254,7 +250,7 @@ class PhysicsBodySimple {
       // Apply restitution to the speed
       speed *= min(obj1.restitution, obj2.restitution);
       //delayedPrint(speed.toString());
-      if (speed < 0) {
+      if (speed < 0.1) {
         return;
       }
 
@@ -267,6 +263,8 @@ class PhysicsBodySimple {
       obj1.collideWithObject(obj2);
       obj2.collideWithObject(obj1);
 
+      //print("${obj1.pos.y}, ${obj1.velocity.y}, $speed, $impulse");
+
       /// check any one of them is static
       if (obj2.immovable == true) {
         obj2.velocity.y = 0;
@@ -278,6 +276,14 @@ class PhysicsBodySimple {
       //   print(obj1.velocity);
       // }
     }
+  }
+
+  bool checkIfBlocked(PhysicsBodySimple obj1, PhysicsBodySimple obj2) {
+    Vector2 sizeBoth = obj1.size.add(obj2.size);
+    var smallStepUp = (obj1.pos.y - obj2.pos.y) * 2 > sizeBoth.y + gravity; // prefer to push up if small delta
+    var isBlockedY = (obj1.pos.y - obj2.pos.y).abs() * 2 < sizeBoth.y;
+
+    return (smallStepUp || isBlockedY);
   }
 
   update(Canvas canvas, {double elapsedTime = 0.0, double timestamp = 0.0, bool shouldUpdate = true}) {
@@ -299,7 +305,6 @@ class PhysicsBodySimple {
 
     // // apply physics
     var oldPos = Vector2(x: pos.x.toDouble(), y: pos.y.toDouble());
-    //velocity.x += gravity * elapsedTime;
 
     // if (isCollidingAt == "none") {
     velocity.y += gravity * timestamp;
@@ -312,6 +317,11 @@ class PhysicsBodySimple {
       velocity.y = 0;
     } else {
       pos = Vector2(x: oldPos.x + velocity.x * timestamp, y: oldPos.y + velocity.y * timestamp);
+
+      /// push outside of collision
+      if (isCollidingAt == "bottom" && velocity.y > 0) {
+        pos = oldPos;
+      }
 
       angle += angleVelocity *= angleDamping;
     }
