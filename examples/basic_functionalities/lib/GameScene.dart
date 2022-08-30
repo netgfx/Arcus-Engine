@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
+import 'package:arcus_engine/helpers/sound_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -39,6 +40,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
   // entity stuff
   ActionManager actions = ActionManager();
   SpriteCache cache = SpriteCache();
+
   bool cacheReady = false;
   List<dynamic> spritesArr = [];
   late TweenManager _tween;
@@ -57,6 +59,11 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _controller.repeat();
 
+      /// audio cache
+      SoundManager.shared.addItem(
+        "click",
+        "assets/sounds/click.mp3",
+      );
       // cache
       cache.addItem(
         "mage1",
@@ -145,16 +152,19 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         ),
       ),
       Sprite(
-        position: const Point<double>(250.0, 600.0),
-        textureName: "greyblock",
-        scale: 0.30,
-        zIndex: 2,
-        enablePhysics: true,
-        startAlive: true,
-        fitParent: false,
-        centerOffset: const Offset(0, 0),
-        physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 10, immovable: true),
-      ),
+          position: const Point<double>(250.0, 600.0),
+          textureName: "greyblock",
+          scale: 0.30,
+          zIndex: 2,
+          interactive: true,
+          enablePhysics: true,
+          startAlive: true,
+          fitParent: false,
+          centerOffset: const Offset(0, 0),
+          physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 10, immovable: true),
+          onEvent: (Point event, SpriteArchetype sprite) => {
+                print("this greyblock is tapped"),
+              }),
       Sprite(
         position: const Point<double>(0.0, 0.0),
         textureName: "bg",
@@ -167,29 +177,30 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         currentFrame: "fly/Fly2_Bats",
         id: "bat",
         centerOffset: Offset(0.0, 0.0),
-        loop: LoopMode.Repeat,
+        loop: RepeatMode.Repeat,
         scale: 0.5,
         zIndex: 2,
         startAlive: true,
         fps: 24,
         onEvent: (Point event, SpriteArchetype sprite) => {
           print("I'm tapped!!!"),
-          _tween.addTween(
-            TweenOptions(
-              target: "bat",
-              collection: sprites,
-              property: "scale",
-              to: 0.8,
-              autostart: true,
-              animationProperties: AnimationProperties(
-                duration: 2000,
-                delay: 0,
-                ease: Curves.easeOutBack,
-              ),
-            ),
-            () => {print("tween complete!")},
-            null,
-          )
+          SoundManager.shared.playTrack("click"),
+          // _tween.addTween(
+          //   TweenOptions(
+          //     target: "bat",
+          //     collection: sprites,
+          //     property: "scale",
+          //     to: 0.8,
+          //     autostart: true,
+          //     animationProperties: AnimationProperties(
+          //       duration: 2000,
+          //       delay: 0,
+          //       ease: Curves.easeOutBack,
+          //     ),
+          //   ),
+          //   () => {print("tween complete!")},
+          //   null,
+          // )
         },
         interactive: true,
       ),

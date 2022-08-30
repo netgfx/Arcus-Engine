@@ -260,7 +260,7 @@ class SpriteDriverCanvas extends CustomPainter {
             position: coords,
             textureName: name,
             currentFrame: frame,
-            loop: LoopMode.Single,
+            loop: RepeatMode.Single,
             startAlive: true,
           ));
     }

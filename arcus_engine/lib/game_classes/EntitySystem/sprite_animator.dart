@@ -15,7 +15,7 @@ import 'package:arcus_engine/helpers/action_manager.dart';
 import 'package:arcus_engine/helpers/sprite_cache.dart';
 import 'package:arcus_engine/helpers/utils.dart';
 
-enum LoopMode {
+enum RepeatMode {
   Single,
   Repeat,
 }
@@ -27,7 +27,7 @@ class SpriteAnimator with SpriteArchetype {
   Map<String, List<Map<String, dynamic>>> spriteData = {};
   List<String> delimiters = [];
   double? fps = 250;
-  LoopMode loop;
+  RepeatMode loop;
   int currentIndex = 0;
   int textureWidth = 0;
   int textureHeight = 0;
@@ -119,7 +119,7 @@ class SpriteAnimator with SpriteArchetype {
         }
 
         if (currentIndex >= spriteData[currentFrame]!.length) {
-          if (this.loop == LoopMode.Single) {
+          if (this.loop == RepeatMode.Single) {
             this.alive = false;
           }
           currentIndex = 0;
@@ -168,6 +168,7 @@ class SpriteAnimator with SpriteArchetype {
       this.spriteData = cacheItem["spriteData"];
       var img = spriteData[currentFrame]![currentIndex];
       this.size = Size(img["width"].toDouble() * this.scale, img["height"].toDouble() * this.scale);
+      print(this.size);
     }
   }
 
@@ -175,9 +176,15 @@ class SpriteAnimator with SpriteArchetype {
     this.position = value;
   }
 
-  Point<double> getPosition() {
+  Point<double> getPosition({bool centerPoint = false}) {
     var img = spriteData[currentFrame]![currentIndex];
-    Point<double> pos = Point(position.x - img["width"].toDouble() * scale / 2, position.y - img["height"].toDouble() * scale / 2);
+    Point<double> pos = const Point(0, 0);
+    if (centerPoint == true) {
+      pos = Point(position.x - img["width"].toDouble() * scale / 2, position.y - img["height"].toDouble() * scale / 2);
+    } else {
+      pos = position;
+    }
+
     return pos;
   }
 
