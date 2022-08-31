@@ -685,7 +685,6 @@ class Utils {
 * @return {boolean} A value of true if the Rectangle object contains the specified point; otherwise false.
 */
   bool containsRaw(double rx, double ry, double rw, double rh, double x, double y) {
-    print("$rw, $rh");
     return (x >= rx && x < (rx + rw) && y >= ry && y < (ry + rh));
   }
 

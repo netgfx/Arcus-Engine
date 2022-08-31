@@ -1,12 +1,18 @@
 import 'package:just_audio/just_audio.dart';
 
+class AudioObject {
+  AudioPlayer player;
+  double volume;
+  AudioObject({required this.player, required this.volume});
+}
+
 class SoundManager {
   static SoundManager shared = SoundManager._();
   SoundManager._();
 
   static SoundManager get instance => shared;
   Map<String, dynamic> audioCache = {};
-  Map<String, dynamic> playingTracks = {};
+  Map<String, AudioObject> playingTracks = {};
 
   void addItem(String key, String url) async {
     //var audioSource = AudioPlayer();
@@ -31,21 +37,33 @@ class SoundManager {
     });
 
     ///
-    playingTracks[key] = player;
+    playingTracks[key] = AudioObject(player: player, volume: volume);
     await player.play();
 
     //player.play();
   }
 
   void pauseTrack(String key) {
-    if (playingTracks[key]) {
-      playingTracks[key].pause();
+    if (playingTracks[key] != null) {
+      playingTracks[key]!.player.pause();
     }
   }
 
   void resumeTrack(String key) {
-    if (playingTracks[key]) {
-      playingTracks[key].play();
+    if (playingTracks[key] != null) {
+      playingTracks[key]!.player.play();
     }
+  }
+
+  void muteAll() {
+    playingTracks.forEach((key, value) {
+      value.player.setVolume(0.0);
+    });
+  }
+
+  void unMuteAll() {
+    playingTracks.forEach((key, value) {
+      value.player.setVolume(value.volume);
+    });
   }
 }
