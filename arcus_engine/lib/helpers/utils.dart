@@ -830,7 +830,7 @@ class Utils {
  *  @return {Number}
  *  @memberof Random */
   rand({a = 1, b = 0}) {
-    return b + (a - b) * this._random.nextDouble();
+    return b + (a - b) * _random.nextDouble();
   }
 
   simpleClamp(v, {min = 0, max = 1}) {
@@ -867,5 +867,9 @@ class Utils {
     }
 
     return (collision);
+  }
+
+  randInCircle({radius = 1, minRadius = 0}) {
+    return radius > 0 ? randVector(length: radius * pow(rand(a: minRadius / radius, b: 1), .5)) : vector2.Vector2(x: 0, y: 0);
   }
 }

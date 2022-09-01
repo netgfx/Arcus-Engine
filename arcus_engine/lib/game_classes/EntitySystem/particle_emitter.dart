@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
+import 'package:arcus_engine/helpers/GameObject.dart';
+import 'package:arcus_engine/helpers/utils.dart';
 import 'package:flutter/rendering.dart';
 
 class ParticleEmitter {
@@ -27,31 +29,38 @@ class ParticleEmitter {
   bool additive = false;
   bool randomColorLinear = true;
   int renderOrder = 0;
+  List<dynamic> children = [];
+  double spawnTime = 0;
+  int particleEmitRateScale = 1;
+  double emitTimeBuffer = 0;
+  bool alive = false;
 
-  ParticleEmitter(
-      {required this.pos,
-      angle,
-      emitSize,
-      emitTime,
-      emitRate,
-      emitConeAngle,
-      startColor,
-      endColor,
-      particleTime,
-      sizeStart,
-      sizeEnd,
-      speed,
-      angleSpeed,
-      damping,
-      angleDamping,
-      gravityScale,
-      particleConeAngle,
-      fadeRate,
-      randomness,
-      collideTiles,
-      additive,
-      randomColorLinear,
-      renderOrder}) {
+  ParticleEmitter({
+    required this.pos,
+    angle,
+    emitSize,
+    emitTime,
+    emitRate,
+    emitConeAngle,
+    startColor,
+    endColor,
+    particleTime,
+    sizeStart,
+    sizeEnd,
+    speed,
+    angleSpeed,
+    damping,
+    angleDamping,
+    gravityScale,
+    particleConeAngle,
+    fadeRate,
+    randomness,
+    collideTiles,
+    additive,
+    randomColorLinear,
+    renderOrder,
+    startAlive,
+  }) {
     angle = angle ?? 0;
     emitSize = emitSize ?? 0;
     emitTime = emitTime ?? 0;
@@ -74,5 +83,38 @@ class ParticleEmitter {
     additive = additive ?? false;
     randomColorLinear = randomColorLinear ?? true;
     renderOrder = renderOrder ?? 0;
+    alive = startAlive ?? false;
+
+    ///
+    spawnTime = GameObject.shared.time;
+    children = [];
+    collideTiles = true;
+  }
+
+  update(Canvas canvas, {double elapsedTime = 0, double timestamp = 0.0, bool shouldUpdate = true}) {
+    if (emitTime == 0 || getAliveTime() <= emitTime) {
+      // emit particles
+      if (emitRate * particleEmitRateScale != 0) {
+        var rate = 1 / emitRate / particleEmitRateScale;
+        for (emitTimeBuffer += GameObject.shared.timeDelta; emitTimeBuffer > 0; emitTimeBuffer -= rate) {
+          emitParticle();
+        }
+      }
+    } else {
+      destroy();
+    }
+  }
+
+  getAliveTime() {
+    return GameObject.shared.time - spawnTime;
+  }
+
+  destroy() {
+    alive = false;
+  }
+
+  emitParticle() {
+    var pos = (Vector2(x: Utils.shared.rand(a: -.5, b: .5), y: Utils.shared.rand(a: -.5, b: .5))).multiply(emitSize).rotate(angle); // box emitter
+    //Utils.shared.randInCircle(radius: emitSize * .5);
   }
 }

@@ -12,6 +12,9 @@ class GameObject {
 
   ///
   TDWorld? world = null;
+  double time = 0;
+  int frameRate = 60;
+  double timeDelta = 1 / 60;
   List<CubicBezier> cubicBeziers = [];
   Map<String, ui.Image> imageCache = {};
   SpriteCache spriteCache = SpriteCache();

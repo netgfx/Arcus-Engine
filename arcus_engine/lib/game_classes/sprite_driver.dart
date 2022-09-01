@@ -137,6 +137,9 @@ class SpriteDriverCanvas extends CustomPainter {
         var lastElapsed = (controller!.lastElapsedDuration!.inMilliseconds - oldTimestamp) / 1000;
         oldTimestamp = controller!.lastElapsedDuration!.inMilliseconds;
 
+        /// save to world
+        GameObject.shared.time = controller!.lastElapsedDuration!.inMilliseconds.toDouble();
+
         /// in order to run in our required frames per second
         if (this.controller!.lastElapsedDuration!.inMilliseconds - this.currentTime >= timeDecay) {
           /// reset the time
