@@ -4,6 +4,9 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
+import 'package:arcus_engine/helpers/sound_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +40,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
   // entity stuff
   ActionManager actions = ActionManager();
   SpriteCache cache = SpriteCache();
+
   bool cacheReady = false;
   List<dynamic> spritesArr = [];
   late TweenManager _tween;
@@ -46,8 +50,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tween = TweenManager(ticker: this);
-    _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _controller = AnimationController(vsync: this, duration: Duration(seconds: 1));
     //_spriteController = AnimationController(vsync: this, duration: Duration(seconds: 1));
     //_controller.addListener(() {setState(() {});}); no need to setState
     //_controller.drive(CurveTween(curve: Curves.bounceIn));
@@ -56,6 +59,11 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _controller.repeat();
 
+      /// audio cache
+      SoundManager.shared.addItem(
+        "click",
+        "assets/sounds/click.mp3",
+      );
       // cache
       cache.addItem(
         "mage1",
@@ -64,6 +72,10 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       cache.addItem(
         "redblock",
         texturePath: "assets/red.png",
+      );
+      cache.addItem(
+        "greyblock",
+        texturePath: "assets/grey.png",
       );
       cache.addItem(
         "boom",
@@ -109,69 +121,94 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     group.enableDebug = true;
 
     group.addItem(
-      Point<double>(0.0, 0.0),
-      TDSprite(
-        position: Point<double>(0.0, 0.0),
+      const Point<double>(0.0, 0.0),
+      Sprite(
+        position: const Point<double>(0.0, 0.0),
         textureName: "mage1",
         startAlive: true,
         scale: 0.8,
         fitParent: false,
-        centerOffset: Offset(0, 0),
+        centerOffset: const Offset(0, 0),
       ),
     );
 
     sprites = [
-      TDSprite(
-          position: Point<double>(250.0, 40.0),
-          textureName: "redblock",
-          scale: 0.28,
+      Sprite(
+        position: const Point<double>(250.0, 40.0),
+        textureName: "redblock",
+        scale: 0.28,
+        zIndex: 2,
+        enablePhysics: true,
+        startAlive: true,
+        fitParent: false,
+        centerOffset: const Offset(0, 0),
+        onCollide: (obj) {
+          //print("collision with: ${obj}");
+        },
+        physicsProperties: PhysicsBodyProperties(
+          velocity: Vector2(x: 0, y: 0),
+          restitution: 0.6,
+          friction: 0.95,
+        ),
+      ),
+      Sprite(
+          position: const Point<double>(250.0, 600.0),
+          textureName: "greyblock",
+          scale: 0.30,
           zIndex: 2,
+          interactive: true,
           enablePhysics: true,
           startAlive: true,
           fitParent: false,
-          centerOffset: Offset(0, 0)),
-      TDSprite(
-        position: Point<double>(0.0, 0.0),
+          centerOffset: const Offset(0, 0),
+          physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 10, immovable: true),
+          onEvent: (Point event, SpriteArchetype sprite) => {
+                print("this greyblock is tapped"),
+              }),
+      Sprite(
+        position: const Point<double>(0.0, 0.0),
         textureName: "bg",
         startAlive: true,
         scale: 1.0,
       ),
-      TDSpriteAnimator(
+      SpriteAnimator(
         position: Point<double>(100.0, 100.0),
         textureName: "bat",
         currentFrame: "fly/Fly2_Bats",
         id: "bat",
         centerOffset: Offset(0.0, 0.0),
-        loop: LoopMode.Repeat,
+        loop: RepeatMode.Repeat,
         scale: 0.5,
         zIndex: 2,
         startAlive: true,
         fps: 24,
         onEvent: (Point event, SpriteArchetype sprite) => {
           print("I'm tapped!!!"),
-          _tween.addTween(
-            TweenOptions(
-              target: "bat",
-              collection: sprites,
-              property: "scale",
-              to: 0.8,
-              autostart: true,
-              animationProperties: AnimationProperties(
-                duration: 2000,
-                delay: 0,
-                ease: Curves.easeOutBack,
-              ),
-            ),
-            () => {print("tween complete!")},
-            null,
-          )
+          SoundManager.shared.playTrack("click"),
+          // _tween.addTween(
+          //   TweenOptions(
+          //     target: "bat",
+          //     collection: sprites,
+          //     property: "scale",
+          //     to: 0.8,
+          //     autostart: true,
+          //     animationProperties: AnimationProperties(
+          //       duration: 2000,
+          //       delay: 0,
+          //       ease: Curves.easeOutBack,
+          //     ),
+          //   ),
+          //   () => {print("tween complete!")},
+          //   null,
+          // )
         },
         interactive: true,
       ),
       ShapeMaker(
-        type: ShapeType.Circle,
-        position: Point<double>(200.0, 250.0),
-        radius: 40,
+        type: ShapeType.Rect,
+        position: const Point<double>(200.0, 250.0),
+        radius: 20,
+        size: const Size(300, 10),
         zIndex: 1,
         interactive: false,
         paintOptions: {
@@ -179,6 +216,8 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
           "paintingStyle": ui.PaintingStyle.fill,
         },
         startAlive: true,
+        enablePhysics: true,
+        physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 1000, immovable: true),
       ),
       group
     ];
@@ -235,8 +274,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
           //         ),
           //       )),
           // ),
-          body: LayoutBuilder(builder:
-              (BuildContext context, BoxConstraints viewportConstraints) {
+          body: LayoutBuilder(builder: (BuildContext context, BoxConstraints viewportConstraints) {
             this.viewportConstraints = viewportConstraints;
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
@@ -270,10 +308,8 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
                                     viewportConstraints.maxWidth,
                                     viewportConstraints.maxHeight,
                                   ),
-                                  mapSize: Size(viewportConstraints.maxWidth,
-                                      viewportConstraints.maxHeight),
-                                  followObject:
-                                      Rect.fromLTWH(200.0, 180.0, 80, 80),
+                                  mapSize: Size(viewportConstraints.maxWidth, viewportConstraints.maxHeight),
+                                  followObject: Rect.fromLTWH(200.0, 180.0, 80, 80),
                                   offset: Point<double>(0.0, 0.0),
                                 ),
                               ),

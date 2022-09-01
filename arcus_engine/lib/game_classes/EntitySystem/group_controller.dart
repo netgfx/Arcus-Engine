@@ -128,13 +128,15 @@ class GroupController {
   }
 
   // update function
-  void update(Canvas canvas,
-      {double elapsedTime = 0.0, bool shouldUpdate = true}) {
+  void update(
+    Canvas canvas, {
+    double elapsedTime = 0.0,
+    double timestamp = 0.0,
+    bool shouldUpdate = true,
+  }) {
     for (var item in this.items) {
-      item["object"].position = Point(this.position.x + item["groupPosition"].x,
-          this.position.y + item["groupPosition"].y);
-      item["object"]
-          .update(canvas, elapsedTime: elapsedTime, shouldUpdate: shouldUpdate);
+      item["object"].position = Point(this.position.x + item["groupPosition"].x, this.position.y + item["groupPosition"].y);
+      item["object"].update(canvas, elapsedTime: elapsedTime, shouldUpdate: shouldUpdate);
     }
     this.size = _calculateSize();
     if (enableDebug == true) {
@@ -150,16 +152,11 @@ class GroupController {
       ..strokeWidth = 2;
     updateCanvas(canvas, 0, 0, null, () {
       //print("group size is: ${this.size.width}, ${this.size.height}");
-      canvas.drawRect(
-          Rect.fromLTWH(this.position.x, this.position.y, this.size.width,
-              this.size.height),
-          border);
+      canvas.drawRect(Rect.fromLTWH(this.position.x, this.position.y, this.size.width, this.size.height), border);
     });
   }
 
-  void updateCanvas(Canvas canvas, double? x, double? y, double? rotate,
-      VoidCallback callback,
-      {bool translate = false}) {
+  void updateCanvas(Canvas canvas, double? x, double? y, double? rotate, VoidCallback callback, {bool translate = false}) {
     double _x = x ?? 0;
     double _y = y ?? 0;
     canvas.save();

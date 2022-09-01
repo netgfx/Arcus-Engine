@@ -27,6 +27,7 @@ mixin SpriteArchetype {
   int _zIndex = 0;
   bool _enablePhysics = false;
   PhysicsBodySimple? _physicsBody = null;
+  PhysicsBodyProperties physicsBodyProperties = PhysicsBodyProperties();
 
   // SpriteArchetype({
   //   required this.position,
@@ -35,8 +36,12 @@ mixin SpriteArchetype {
   //   scale,
   // }) {}
 
-  void update(Canvas canvas,
-      {double elapsedTime = 0.0, bool shouldUpdate = true}) {}
+  void update(
+    Canvas canvas, {
+    double elapsedTime = 0.0,
+    double timestamp = 0.0,
+    bool shouldUpdate = true,
+  }) {}
 
   String get id {
     return this._id;
@@ -114,9 +119,7 @@ mixin SpriteArchetype {
     return true;
   }
 
-  void updateCanvas(
-      Canvas canvas, double? x, double? y, double? scale, VoidCallback callback,
-      {bool translate = false}) {
+  void updateCanvas(Canvas canvas, double? x, double? y, double? scale, VoidCallback callback, {bool translate = false}) {
     double _x = x ?? 0;
     double _y = y ?? 0;
     canvas.save();

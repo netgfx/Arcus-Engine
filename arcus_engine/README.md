@@ -10,6 +10,7 @@
 
 ✔️ (done)
 ❗ (important)
+🧪 (needs testing)
 ❌ (problem)
 🚩 (revisit)
 🚀 (launch)
@@ -20,6 +21,7 @@
 ### Release v0.1
 
 - Custom events on canvas elements 🏭 (click is working, need to support drag also and hover)
+  - check effects to use centered pos when clicked (could be a self property like `useCenterPosition=true`)
 - keyboard events (https://api.flutter.dev/flutter/widgets/KeyboardListener-class.html)
 - Depth sorting ✔️
   - Event honoring depth, so only first is supported ✔️
@@ -31,17 +33,22 @@
 - Pooling 🚩
 - port Arcade physics ❗
   - Simple physics 🏭
-  - generalize the collision
+  - generalize the collision 🏭
   - fix collide with bounds ✔️
 - create master Sprite class for all game objects to inherit basic properties via mixin ✔️
-- cache ✔️
+- Sprite cache ✔️
 - loader class for all assets ✔️
-- audio (https://pub.dev/packages/audioplayers)
+- audio (https://pub.dev/packages/just_audio) 🏭
+  - Basic sound playback, working ✔️
+  - Need to add repeating background sound 🧪
+  - Might need some preloading work or cache
+  - Add global mute 🧪
 - Shapes ✔️
 - Group component 🏭
 - Plugin template 🏭
 - Proper tilemap and culling
 - Autoscroll tile-sprite
+- Particles 🏭
 - Camera 🏭
   - need to test with scrolling sprite (WIP)
   - need to test moving sprite
@@ -53,3 +60,4 @@
 - whack a mole
 - auto-runner
 - Bullet-hell
+- Arcanoid

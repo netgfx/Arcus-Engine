@@ -48,6 +48,7 @@ dependencies:
   bezier: ^1.2.0 
   collection: ^1.16.0
   async: ^2.8.2
+  just_audio: ^0.9.28
   arcus_engine:
     path: ../../arcus_engine
   flutter:
@@ -88,6 +89,7 @@ flutter:
     - assets/pat/
     - assets/td/
     - assets/maze/
+    - assets/sounds/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

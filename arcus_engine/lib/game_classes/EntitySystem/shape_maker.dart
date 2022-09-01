@@ -1,11 +1,14 @@
 import "dart:math";
 import "dart:ui";
 
+import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
+import 'package:arcus_engine/helpers/GameObject.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
-import 'package:vector_math/vector_math_64.dart';
+import 'package:vector_math/vector_math.dart' as vectorMath;
 
 enum ShapeType {
   Circle,
@@ -41,20 +44,25 @@ class ShapeMaker {
   String _id = "";
   dynamic _physicsBody = null;
   bool enablePhysics = false;
+  TDWorld? world = GameObject.shared.getWorld();
+  PhysicsBodyProperties physicsBodyProperties = PhysicsBodyProperties();
+  Function? _onCollide;
 
-  ShapeMaker(
-      {required this.type,
-      size,
-      radius,
-      position,
-      angle,
-      paintOptions,
-      startAlive,
-      id,
-      zIndex,
-      interactive,
-      enablePhysics,
-      physicsBody}) {
+  ShapeMaker({
+    required this.type,
+    size,
+    radius,
+    position,
+    angle,
+    paintOptions,
+    startAlive,
+    id,
+    zIndex,
+    interactive,
+    enablePhysics,
+    physicsProperties,
+    onCollide,
+  }) {
     this.size = size ?? Size(20, 20);
     this._color = Color.fromARGB(255, 0, 0, 0);
     this.radius = radius.toDouble() ?? 50.0;
@@ -78,11 +86,61 @@ class ShapeMaker {
         ..color = this._color
         ..style = PaintingStyle.fill;
     }
+
+    physicsBodyProperties = physicsProperties ?? PhysicsBodyProperties();
+    if (startAlive == true) {
+      alive = true;
+    }
+
+    this.enablePhysics = enablePhysics ?? false;
+    if (this.enablePhysics == true) {
+      setupPhysicsBody();
+      _onCollide = onCollide;
+    }
   }
 
-  void update(Canvas canvas,
-      {double elapsedTime = 0, bool shouldUpdate = true}) {
-    drawType(canvas, this.type);
+  void update(
+    Canvas canvas, {
+    double elapsedTime = 0,
+    double timestamp = 0.0,
+    bool shouldUpdate = true,
+  }) {
+    /// Physics
+    if (enablePhysics == true && physicsBody == null) {
+      setupPhysicsBody();
+    }
+    if (physicsBody != null) {
+      physicsBody!.update(
+        canvas,
+        elapsedTime: elapsedTime,
+        timestamp: timestamp,
+        shouldUpdate: shouldUpdate,
+      );
+
+      /// apply the physics pos to the actual object
+      position = Point(physicsBody!.pos.x, physicsBody!.pos.y);
+    }
+
+    drawType(canvas, type);
+  }
+
+  ///
+  setupPhysicsBody() {
+    world = GameObject.shared.getWorld();
+    if (world != null) {
+      physicsBody = PhysicsBodySimple(
+        object: this,
+        pos: Vector2(x: position.x, y: position.y),
+        world: world!,
+        size: Vector2(x: size.width, y: size.height),
+        physicsProperties: physicsBodyProperties,
+        onCollision: _onCollide,
+      );
+    }
+  }
+
+  bool onCollide(dynamic item) {
+    return true;
   }
 
   void drawType(Canvas canvas, ShapeType type) {
@@ -144,10 +202,7 @@ class ShapeMaker {
   void drawRRect(Canvas canvas, {double? cornerRadius}) {
     updateCanvas(canvas, 0, 0, 0, () {
       Rect rect = Rect.fromLTWH(0, 0, this.size.width, this.size.height);
-      canvas.drawRRect(
-          RRect.fromRectAndRadius(
-              rect, Radius.circular(cornerRadius ?? radius * 0.2)),
-          this.paint);
+      canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(cornerRadius ?? radius * 0.2)), this.paint);
     });
   }
 
@@ -155,7 +210,7 @@ class ShapeMaker {
     updateCanvas(canvas, 0, 0, 0, () {
       final Path path = Path();
       for (int i = 0; i < num; i++) {
-        final double radian = radians(initialAngle + 360 / num * i.toDouble());
+        final double radian = vectorMath.radians(initialAngle + 360 / num * i.toDouble());
         final double x = radius * cos(radian);
         final double y = radius * sin(radian);
         if (i == 0) {
@@ -165,7 +220,7 @@ class ShapeMaker {
         }
       }
       path.close();
-      canvas.drawPath(path, this.paint);
+      canvas.drawPath(path, paint);
     });
   }
 
@@ -175,10 +230,8 @@ class ShapeMaker {
 
       path.moveTo(0, radius);
 
-      path.cubicTo(-radius * 2, -radius * 0.5, -radius * 0.5, -radius * 1.5, 0,
-          -radius * 0.5);
-      path.cubicTo(
-          radius * 0.5, -radius * 1.5, radius * 2, -radius * 0.5, 0, radius);
+      path.cubicTo(-radius * 2, -radius * 0.5, -radius * 0.5, -radius * 1.5, 0, -radius * 0.5);
+      path.cubicTo(radius * 0.5, -radius * 1.5, radius * 2, -radius * 0.5, 0, radius);
 
       canvas.drawPath(path, paint);
     });
@@ -188,7 +241,7 @@ class ShapeMaker {
     updateCanvas(canvas, 0, 0, 0, () {
       final Path path = Path();
       for (int i = 0; i < num; i++) {
-        final double radian = radians(initialAngle + 360 / num * i.toDouble());
+        final double radian = vectorMath.radians(initialAngle + 360 / num * i.toDouble());
         final double x = radius * (i.isEven ? 0.5 : 1) * cos(radian);
         final double y = radius * (i.isEven ? 0.5 : 1) * sin(radian);
         if (i == 0) {
@@ -204,8 +257,7 @@ class ShapeMaker {
 
   void drawRect(Canvas canvas) {
     updateCanvas(canvas, this.position.x, this.position.y, this.angle, () {
-      canvas.drawRect(
-          Rect.fromLTWH(0, 0, this.size.width, this.size.height), this.paint);
+      canvas.drawRect(Rect.fromLTWH(0, 0, this.size.width, this.size.height), this.paint);
     });
   }
 
@@ -258,14 +310,11 @@ class ShapeMaker {
   }
 
   Point<double> getPosition() {
-    Point<double> pos = Point(
-        position.x - this.size.width / 2, position.y - this.size.height / 2);
+    Point<double> pos = Point(position.x - this.size.width / 2, position.y - this.size.height / 2);
     return pos;
   }
 
-  void updateCanvas(Canvas canvas, double? x, double? y, double? rotate,
-      VoidCallback callback,
-      {bool translate = false}) {
+  void updateCanvas(Canvas canvas, double? x, double? y, double? rotate, VoidCallback callback, {bool translate = false}) {
     double _x = x ?? 0;
     double _y = y ?? 0;
     canvas.save();

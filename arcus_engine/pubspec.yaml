@@ -28,6 +28,7 @@ dev_dependencies:
   bezier: ^1.2.0 
   collection: ^1.16.0
   async: ^2.8.2
+  just_audio: ^0.9.28
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
