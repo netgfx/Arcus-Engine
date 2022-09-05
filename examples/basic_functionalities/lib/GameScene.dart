@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:arcus_engine/game_classes/EntitySystem/particle_emitter.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
 import 'package:arcus_engine/helpers/sound_manager.dart';
@@ -133,38 +134,38 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     );
 
     sprites = [
-      Sprite(
-        position: const Point<double>(250.0, 40.0),
-        textureName: "redblock",
-        scale: 0.28,
-        zIndex: 2,
-        enablePhysics: true,
-        startAlive: true,
-        fitParent: false,
-        centerOffset: const Offset(0, 0),
-        onCollide: (obj) {
-          //print("collision with: ${obj}");
-        },
-        physicsProperties: PhysicsBodyProperties(
-          velocity: Vector2(x: 0, y: 0),
-          restitution: 0.6,
-          friction: 0.95,
-        ),
-      ),
-      Sprite(
-          position: const Point<double>(250.0, 600.0),
-          textureName: "greyblock",
-          scale: 0.30,
-          zIndex: 2,
-          interactive: true,
-          enablePhysics: true,
-          startAlive: true,
-          fitParent: false,
-          centerOffset: const Offset(0, 0),
-          physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 10, immovable: true),
-          onEvent: (Point event, SpriteArchetype sprite) => {
-                print("this greyblock is tapped"),
-              }),
+      // Sprite(
+      //   position: const Point<double>(250.0, 40.0),
+      //   textureName: "redblock",
+      //   scale: 0.28,
+      //   zIndex: 2,
+      //   enablePhysics: true,
+      //   startAlive: true,
+      //   fitParent: false,
+      //   centerOffset: const Offset(0, 0),
+      //   onCollide: (obj) {
+      //     //print("collision with: ${obj}");
+      //   },
+      //   physicsProperties: PhysicsBodyProperties(
+      //     velocity: Vector2(x: 0, y: 0),
+      //     restitution: 0.6,
+      //     friction: 0.95,
+      //   ),
+      // ),
+      // Sprite(
+      //     position: const Point<double>(250.0, 600.0),
+      //     textureName: "greyblock",
+      //     scale: 0.30,
+      //     zIndex: 2,
+      //     interactive: true,
+      //     enablePhysics: true,
+      //     startAlive: true,
+      //     fitParent: false,
+      //     centerOffset: const Offset(0, 0),
+      //     physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 10, immovable: true),
+      //     onEvent: (Point event, SpriteArchetype sprite) => {
+      //           print("this greyblock is tapped"),
+      //         }),
       Sprite(
         position: const Point<double>(0.0, 0.0),
         textureName: "bg",
@@ -204,21 +205,36 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         },
         interactive: true,
       ),
-      ShapeMaker(
-        type: ShapeType.Rect,
-        position: const Point<double>(200.0, 250.0),
-        radius: 20,
-        size: const Size(300, 10),
-        zIndex: 1,
-        interactive: false,
-        paintOptions: {
-          "color": Colors.red,
-          "paintingStyle": ui.PaintingStyle.fill,
-        },
-        startAlive: true,
-        enablePhysics: true,
-        physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 1000, immovable: true),
-      ),
+      ParticleEmitter(
+          pos: Vector2(x: 200.0, y: 300.0),
+          emitSize: Vector2(x: 36, y: 36),
+          emitTime: 0.1,
+          emitRate: 200,
+          emitConeAngle: pi,
+          startColor: const Color.fromRGBO(255, 0, 128, 1),
+          endColor: const Color.fromRGBO(255, 0, 0, 1),
+          particleTime: 0.2,
+          fadeRate: 0.1,
+          randomness: 1,
+          collideTiles: true,
+          randomColorLinear: 0,
+          renderOrder: 1,
+          startAlive: true),
+      // ShapeMaker(
+      //   type: ShapeType.Rect,
+      //   position: const Point<double>(200.0, 250.0),
+      //   radius: 20,
+      //   size: const Size(300, 10),
+      //   zIndex: 1,
+      //   interactive: false,
+      //   paintOptions: {
+      //     "color": Colors.red,
+      //     "paintingStyle": ui.PaintingStyle.fill,
+      //   },
+      //   startAlive: true,
+      //   enablePhysics: true,
+      //   physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 1000, immovable: true),
+      // ),
       group
     ];
 
@@ -241,7 +257,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     });
   }
 
-  void _onPanUpdate(BuildContext context, TapDownDetails details) {
+  void onTap(BuildContext context, TapDownDetails details) {
     //checkCollision();
     // setState(() {
     //   lightSource = Point(details.localPosition.dx, details.localPosition.dy);
@@ -256,29 +272,11 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     return CustomPerformanceOverlay(
       child: Scaffold(
           backgroundColor: ui.Color.fromARGB(255, 17, 17, 17),
-          // bottomNavigationBar: Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: Container(
-          //       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-          //       decoration: BoxDecoration(borderRadius: BorderRadius.circular(50.0), color: Colors.black),
-          //       child: Padding(
-          //         padding: const EdgeInsets.all(8.0),
-          //         child: Column(
-          //           mainAxisSize: MainAxisSize.min,
-          //           children: <Widget>[
-          //             Row(
-          //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //               children: <Widget>[],
-          //             ),
-          //           ],
-          //         ),
-          //       )),
-          // ),
           body: LayoutBuilder(builder: (BuildContext context, BoxConstraints viewportConstraints) {
             this.viewportConstraints = viewportConstraints;
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTapDown: (details) => _onPanUpdate(context, details),
+              onTapDown: (details) => onTap(context, details),
               child: Stack(children: [
                 this.cacheReady == false
                     ? Center(

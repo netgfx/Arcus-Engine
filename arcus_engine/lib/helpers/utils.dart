@@ -872,4 +872,23 @@ class Utils {
   randInCircle({radius = 1, minRadius = 0}) {
     return radius > 0 ? randVector(length: radius * pow(rand(a: minRadius / radius, b: 1), .5)) : vector2.Vector2(x: 0, y: 0);
   }
+
+  randColor(linear, {cA = const Color.fromRGBO(0, 0, 0, 1), cB = const Color.fromRGBO(0, 0, 0, 1)}) {
+    return linear
+        ? cA.lerp(cB, Utils.shared.rand())
+        : Color.fromRGBO(rand(a: cA.red, b: cB.red), rand(a: cA.green, b: cB.green), rand(a: cA.blue, b: cB.blue), rand(a: cA.alpha, b: cB.alpha));
+  }
+
+  randSign() {
+    return (rand(a: 2) | 0) * 2 - 1;
+  }
+}
+
+extension Unique<E, Id> on List<E> {
+  List<E> unique([Id Function(E element)? id, bool inplace = true]) {
+    final ids = Set();
+    var list = inplace ? this : List<E>.from(this);
+    list.retainWhere((x) => ids.add(id != null ? id(x) : x as Id));
+    return list;
+  }
 }

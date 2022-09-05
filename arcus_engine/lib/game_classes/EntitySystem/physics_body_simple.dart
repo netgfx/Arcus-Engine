@@ -45,7 +45,6 @@ class PhysicsBodyProperties {
     mass,
     damping,
     angleDamping,
-    elasticity,
     friction,
     gravityScale,
     renderOrder,
@@ -59,7 +58,6 @@ class PhysicsBodyProperties {
     this.mass = mass ?? 1;
     this.damping = damping ?? 0.99;
     this.angleDamping = angleDamping ?? 0.99;
-    this.elasticity = elasticity ?? 0.15;
     this.friction = friction ?? 0.95;
     this.gravityScale = gravityScale ?? 1;
     this.renderOrder = renderOrder ?? 0;

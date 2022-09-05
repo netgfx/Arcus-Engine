@@ -75,23 +75,23 @@ class SpriteDriverCanvas extends CustomPainter {
     this.actions,
   }) : super(repaint: controller) {
     /// the delay in ms based on desired fps
-    this.timeDecay = (1 / this.fps * 1000).round();
-    this.cameraProps = cameraProps;
+    timeDecay = (1 / fps * 1000).round();
+    cameraProps = cameraProps;
 
     /// calculate world bounds
-    this.worldBounds = Rectangle(x: 0, y: 0, width: this.width, height: this.height);
+    worldBounds = Rectangle(x: 0, y: 0, width: width, height: height);
 
-    if (this._world == null) {
-      this._world = TDWorld();
-      this._world!.worldBounds = Size(this.worldBounds.width, this.worldBounds.height);
-      this._world!.displayList = this.sprites;
-      GameObject.shared.setWorld(this._world!);
+    if (_world == null) {
+      _world = TDWorld();
+      _world!.worldBounds = Size(worldBounds.width, worldBounds.height);
+      _world!.displayList = sprites;
+      GameObject.shared.setWorld(_world!);
     }
-    GameObject.shared.setSpriteCache(this.cache);
+    GameObject.shared.setSpriteCache(cache);
 
     if (this.cameraProps != null) {
       if (this.cameraProps!.enabled == true) {
-        this._camera = Camera(
+        _camera = Camera(
           x: 0,
           y: 0,
           cameraProps: this.cameraProps!,
@@ -112,8 +112,8 @@ class SpriteDriverCanvas extends CustomPainter {
     }
 
     /// add canvas to World
-    if (this._world != null) {
-      this._world!.canvas = this.canvas;
+    if (_world != null) {
+      _world!.canvas = this.canvas;
       GameObject.shared.getWorld()!.canvas = this.canvas;
     }
     draw(canvas, size);
@@ -126,12 +126,11 @@ class SpriteDriverCanvas extends CustomPainter {
 
   void draw(Canvas canvas, Size size) {
     /// check if the controller is running
-    if (this.controller != null) {
-      if (this.controller!.lastElapsedDuration != null) {
+    if (controller != null) {
+      if (controller!.lastElapsedDuration != null) {
         // camera
         if (_camera != null) {
-          canvas.clipRect(
-              Rect.fromLTWH(this.cameraProps!.offset.x, this.cameraProps!.offset.y, _camera!.getCameraBounds().width, _camera!.getCameraBounds().height));
+          canvas.clipRect(Rect.fromLTWH(cameraProps!.offset.x, cameraProps!.offset.y, _camera!.getCameraBounds().width, _camera!.getCameraBounds().height));
           //Rect bounds = _camera!.getCameraBounds();
         }
         var lastElapsed = (controller!.lastElapsedDuration!.inMilliseconds - oldTimestamp) / 1000;
@@ -141,39 +140,55 @@ class SpriteDriverCanvas extends CustomPainter {
         GameObject.shared.time = controller!.lastElapsedDuration!.inMilliseconds.toDouble();
 
         /// in order to run in our required frames per second
-        if (this.controller!.lastElapsedDuration!.inMilliseconds - this.currentTime >= timeDecay) {
+        if (controller!.lastElapsedDuration!.inMilliseconds - currentTime >= timeDecay) {
           /// reset the time
 
-          this.currentTime = this.controller!.lastElapsedDuration!.inMilliseconds;
+          currentTime = controller!.lastElapsedDuration!.inMilliseconds;
+
+          /// combine local list and global display list
+          if (_world != null) {
+            List<dynamic> finalList = [];
+            finalList = [...sprites, ..._world!.displayList];
+            sprites = finalList.unique((item) => item.id);
+          }
 
           var results = [];
-          for (var sprite in this.sprites) {
-            if (sprite.alive == true) {
+          for (var item in sprites) {
+            if (item.alive == true) {
               //depth sort
-              this.depthSort();
+              depthSort();
               // update
-              sprite.update(
+              item.update(
                 canvas,
-                elapsedTime: this.currentTime.toDouble(),
+                elapsedTime: currentTime.toDouble(),
                 timestamp: lastElapsed,
               );
               // check for events
-              if (this.shouldCheckEvent == true) {
-                if (sprite.interactive == true) {
+              if (shouldCheckEvent == true) {
+                if (item.interactive == true) {
                   // need to take depth into account
                   bool result = Utils.shared.containsRaw(
-                    sprite.getPosition().x,
-                    sprite.getPosition().y,
-                    sprite.size.width,
-                    sprite.size.height,
-                    this.eventPoint.x,
-                    this.eventPoint.y,
+                    item.getPosition().x,
+                    item.getPosition().y,
+                    item.size.width,
+                    item.size.height,
+                    eventPoint.x,
+                    eventPoint.y,
                   );
 
                   if (result == true) {
-                    results.add(sprite);
+                    results.add(item);
                   }
                 }
+              }
+            } else {
+              try {
+                if (item.destroyed) {
+                  // remove destroyed item
+                  sprites.removeWhere((element) => element.id == item.id);
+                }
+              } catch (e) {
+                /// no property
               }
             }
           }

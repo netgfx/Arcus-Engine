@@ -1,12 +1,15 @@
 import 'dart:math';
 
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/shape_maker.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
 import 'package:arcus_engine/helpers/GameObject.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:ui' as ui;
 
 class Particle {
+  String id = UniqueKey().toString();
   Vector2 pos = Vector2(x: 0, y: 0);
   double angle = 0;
   PhysicsBodyProperties physicsProperties = PhysicsBodyProperties();
@@ -19,10 +22,24 @@ class Particle {
   double sizeStart = 0;
   double sizeEnd = 0;
   double fadeRate = 1.0;
+  bool destroyed = false;
   double spawnTime = GameObject.shared.time;
+  late ShapeMaker renderer;
 
   Particle({required this.pos, angle, physicsProperties, colorStart, colorEnd, sizeStart, sizeEnd, lifetime, fadeRate, spawnTime, destroyCallback}) {
+    var p = min((GameObject.shared.time - spawnTime) / lifetime, 1);
     spawnTime = GameObject.shared.time;
+    var radius = sizeStart + p * sizeEnd;
+    var size = Vector2(x: radius, y: radius);
+    renderer = ShapeMaker(
+      type: ShapeType.Circle,
+      physicsProperties: physicsProperties,
+      enablePhysics: true,
+      position: pos,
+      size: size,
+      radius: radius,
+      startAlive: true,
+    );
     destroyCallback = destroyCallback;
   }
 
@@ -55,8 +72,9 @@ class Particle {
   destroy() {
     print("destroyed");
     if (destroyCallback != null) {
-      destroyCallback!();
+      destroyCallback!(id);
     }
     alive = false;
+    destroyed = true;
   }
 }

@@ -1,14 +1,18 @@
 import 'dart:math';
 
+import 'package:arcus_engine/game_classes/EntitySystem/particle.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
 import 'package:arcus_engine/helpers/GameObject.dart';
 import 'package:arcus_engine/helpers/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 
 class ParticleEmitter {
+  String id = UniqueKey().toString();
   Vector2 pos = Vector2(x: 0, y: 0);
   double angle = 0;
-  double emitSize = 0;
+  Vector2 emitSize = Vector2(x: 0, y: 0);
   double emitTime = 0;
   int emitRate = 100;
   double emitConeAngle = pi;
@@ -34,6 +38,8 @@ class ParticleEmitter {
   int particleEmitRateScale = 1;
   double emitTimeBuffer = 0;
   bool alive = false;
+  bool destroyed = false;
+  int zIndex = 99;
 
   ParticleEmitter({
     required this.pos,
@@ -62,7 +68,7 @@ class ParticleEmitter {
     startAlive,
   }) {
     angle = angle ?? 0;
-    emitSize = emitSize ?? 0;
+    emitSize = emitSize ?? Vector2(x: 0, y: 0);
     emitTime = emitTime ?? 0;
     emitRate = emitRate ?? 100;
     emitConeAngle = emitConeAngle ?? pi;
@@ -111,10 +117,61 @@ class ParticleEmitter {
 
   destroy() {
     alive = false;
+    destroyed = true;
+    print("destroyed emitter");
   }
 
   emitParticle() {
+    print("emitting particle");
     var pos = (Vector2(x: Utils.shared.rand(a: -.5, b: .5), y: Utils.shared.rand(a: -.5, b: .5))).multiply(emitSize).rotate(angle); // box emitter
-    //Utils.shared.randInCircle(radius: emitSize * .5);
+    //Utils.shared.randInCircle(radius: emitSize.x * .5);
+
+    // randomness scales each paremeter by a percentage
+    var randomness = this.randomness;
+    randomizeScale(v) {
+      return v + v * Utils.shared.rand(a: randomness, b: -randomness);
+    }
+
+    // randomize particle settings
+    var particleTime = randomizeScale(this.particleTime);
+    var sizeStart = randomizeScale(this.sizeStart);
+    var sizeEnd = randomizeScale(this.sizeEnd);
+    var speed = randomizeScale(this.speed);
+    var angleSpeed = randomizeScale(this.angleSpeed) * Utils.shared.randSign();
+    var coneAngle = Utils.shared.rand(a: this.emitConeAngle, b: -this.emitConeAngle);
+    var colorStart = Utils.shared.randColor(randomColorLinear, cA: startColor, cB: startColor);
+    var colorEnd = Utils.shared.randColor(randomColorLinear, cA: endColor, cB: endColor);
+
+    // build particle settings
+
+    var particle = Particle(
+        pos: this.pos.add(pos),
+        angle: angle + Utils.shared.rand(a: particleConeAngle, b: -particleConeAngle),
+        physicsProperties: PhysicsBodyProperties(
+          velocity: (Vector2(x: 0, y: 0)).setAngle(angle + coneAngle, a: speed),
+          friction: 0.8,
+          damping: damping,
+          angleDamping: angleDamping,
+          gravityScale: gravityScale,
+          collideOnWorldBounds: true,
+          collideSolidObjects: true,
+          renderOrder: renderOrder,
+          angleVelocity: angleSpeed,
+          mass: 1,
+          restitution: 0.86,
+        ),
+        lifetime: particleTime,
+        sizeStart: sizeStart,
+        sizeEnd: sizeEnd - sizeStart,
+        fadeRate: fadeRate,
+        colorStart: colorStart,
+        colorEnd: colorEnd.subtract(colorStart),
+        destroyCallback: onParticleDestroy);
+
+    return particle;
+  }
+
+  onParticleDestroy(id) {
+    print("particle destroyed $id");
   }
 }
