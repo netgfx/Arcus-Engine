@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:ui';
-import '../../helpers/Rectangle.dart';
+import '../../helpers/rectangle.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' as vectorMath;
 import 'package:arcus_engine/helpers/utils.dart';
@@ -82,9 +82,7 @@ class TDBullet {
     }, translate: true);
   }
 
-  void rotate(
-      Canvas canvas, double? x, double? y, double? angle, VoidCallback callback,
-      {bool translate = false}) {
+  void rotate(Canvas canvas, double? x, double? y, double? angle, VoidCallback callback, {bool translate = false}) {
     double _x = x ?? 0;
     double _y = y ?? 0;
     canvas.save();
@@ -102,10 +100,8 @@ class TDBullet {
   }
 
   void moveToTarget() {
-    this.x =
-        ui.lerpDouble(this.x, target.x, getStagger(velocity, Easing.LINEAR))!;
-    this.y =
-        ui.lerpDouble(this.y, target.y, getStagger(velocity, Easing.LINEAR))!;
+    this.x = ui.lerpDouble(this.x, target.x, getStagger(velocity, Easing.LINEAR))!;
+    this.y = ui.lerpDouble(this.y, target.y, getStagger(velocity, Easing.LINEAR))!;
 
     //print("${this.x}, ${this.target.x}, ${this.velocity}");
     if (this.x >= target.x - 0.11 && this.y >= target.y - 0.11) {

@@ -3,15 +3,15 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/bullet.dart';
-import 'package:arcus_engine/game_classes/EntitySystem/enemy.dart';
+import './enemy.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/sprite_animator.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/helpers/Circle.dart';
-import 'package:arcus_engine/helpers/GameObject.dart';
+import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/Rectangle.dart';
 import 'package:vector_math/vector_math.dart' as vectorMath;
 import "package:bezier/bezier.dart";
-import "../../helpers/utils.dart";
+import 'package:arcus_engine/helpers/utils.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 
@@ -44,8 +44,7 @@ class TDTower {
   int turretTextureHeight = 0;
   List<TDEnemy> enemies = [];
   List<TDBullet> bullets = [];
-  Rectangle radar = Rectangle(
-      x: 0, y: 0, width: 0, height: 0); //Circle(x: 0, y: 0, radius: 40);
+  Rectangle radar = Rectangle(x: 0, y: 0, width: 0, height: 0); //Circle(x: 0, y: 0, radius: 40);
 
   List<SpriteAnimator> collisionEffects = [];
   TDTower({
@@ -76,8 +75,7 @@ class TDTower {
     for (var i = 0; i < enemies.length; i++) {
       Size enemySize = enemies[i].getEnemySize();
       Size _size = getSize(turretImage);
-      Point<double> enemyCenter =
-          Point(enemies[i].getEnemyRect().left, enemies[i].getEnemyRect().top);
+      Point<double> enemyCenter = Point(enemies[i].getEnemyRect().left.toDouble(), enemies[i].getEnemyRect().top.toDouble());
 
       if (radar.contains(enemies[i].position.x, enemies[i].position.y)) {
         //print("contains ${enemyCenter}");
@@ -88,11 +86,8 @@ class TDTower {
           enemyCenter.y,
         );
         double deg = Utils.shared.radToDeg(_angle);
-        this.angle = _angle +
-            pi /
-                2; //Utils.shared.rotateToAngle(this.angle, _angle + pi / 2, lerp: 0.1);
-        var diff =
-            DateTime.now().millisecondsSinceEpoch - this.lastShot >= this.rof;
+        this.angle = _angle + pi / 2; //Utils.shared.rotateToAngle(this.angle, _angle + pi / 2, lerp: 0.1);
+        var diff = DateTime.now().millisecondsSinceEpoch - this.lastShot >= this.rof;
         //print("diff: ${diff.toString()}");
         //print("rof: ${this.rof.toString()}");
 
@@ -144,10 +139,7 @@ class TDTower {
   }
 
   void showCollisionEffect(Point<double> target) {
-    var effect = this
-        .collisionEffects
-        .cast<SpriteAnimator?>()
-        .firstWhere((element) => element!.alive == false, orElse: () => null);
+    var effect = this.collisionEffects.cast<SpriteAnimator?>().firstWhere((element) => element!.alive == false, orElse: () => null);
     if (effect != null) {
       effect.alive = true;
       effect.setPosition(target);
@@ -204,10 +196,8 @@ class TDTower {
     rotate(canvas, 0, 0, 0, () {
       canvas.drawImageRect(
         baseImage!,
-        Rect.fromLTWH(
-            0, 0, baseTextureWidth.toDouble(), baseTextureHeight.toDouble()),
-        Rect.fromLTWH(
-            this.position.x, this.position.y, baseSize.width, baseSize.height),
+        Rect.fromLTWH(0, 0, baseTextureWidth.toDouble(), baseTextureHeight.toDouble()),
+        Rect.fromLTWH(this.position.x, this.position.y, baseSize.width, baseSize.height),
         paint,
       );
     });
@@ -219,24 +209,18 @@ class TDTower {
       ..isAntiAlias = false;
 
     Size _size = getSize(turretImage!);
-    rotate(canvas, this.position.x + _size.width / 2,
-        this.position.y + _size.height / 2, this.angle, () {
+    rotate(canvas, this.position.x + _size.width / 2, this.position.y + _size.height / 2, this.angle, () {
       canvas.drawImageRect(
         turretImage!,
-        Rect.fromLTWH(0, 0, turretTextureWidth.toDouble(),
-            turretTextureHeight.toDouble()),
-        Rect.fromLTWH(-_size.width / 2, -_size.height / 2 - 10, _size.width,
-            _size.height),
+        Rect.fromLTWH(0, 0, turretTextureWidth.toDouble(), turretTextureHeight.toDouble()),
+        Rect.fromLTWH(-_size.width / 2, -_size.height / 2 - 10, _size.width, _size.height),
         paint,
       );
     });
 
-    Point<double> enemyCenter = Point(
-        enemies[0].getEnemyRect().left, enemies[0].getEnemyRect().centerY);
-    double dist = Utils.shared.distance(enemyCenter.x, enemyCenter.y,
-        position.x + _size.width / 2, position.y + _size.height / 2);
-    drawRect(canvas, this.position.x + _size.width / 2,
-        this.position.y + _size.height / 2, dist, 5);
+    Point<double> enemyCenter = Point(enemies[0].getEnemyRect().left.toDouble(), enemies[0].getEnemyRect().centerY.toDouble());
+    double dist = Utils.shared.distance(enemyCenter.x, enemyCenter.y, position.x + _size.width / 2, position.y + _size.height / 2);
+    drawRect(canvas, this.position.x + _size.width / 2, this.position.y + _size.height / 2, dist, 5);
     // drawLine(
     //   canvas,
     //   Point(this.position.x + _size.width / 2, this.position.y + _size.height / 2),
@@ -247,8 +231,7 @@ class TDTower {
   Point originPosition() {
     if (turretState == "done") {
       Size _size = getSize(turretImage!);
-      return Point(this.position.x + _size.width / 2,
-          this.position.y + _size.height / 2);
+      return Point(this.position.x + _size.width / 2, this.position.y + _size.height / 2);
     } else {
       return Point(0, 0);
     }
@@ -269,10 +252,7 @@ class TDTower {
   void makeBullets() {
     Size _size = getSize(turretImage!);
     for (var i = 0; i < 1; i++) {
-      this.bullets.add(new TDBullet(
-          x: this.position.x + _size.width / 2,
-          y: this.position.y + _size.height / 2,
-          velocity: 0.1));
+      this.bullets.add(new TDBullet(x: this.position.x + _size.width / 2, y: this.position.y + _size.height / 2, velocity: 0.1));
     }
   }
 
@@ -282,19 +262,13 @@ class TDTower {
       Point _target = Utils.shared.extendLine(100, origin, target);
 
       /// take the first inactive bullet
-      var bullet = this
-          .bullets
-          .cast<TDBullet?>()
-          .firstWhere((element) => element!.alive == false, orElse: () => null);
+      var bullet = this.bullets.cast<TDBullet?>().firstWhere((element) => element!.alive == false, orElse: () => null);
       if (bullet != null) {
         bullet.alive = true;
         bullet.target = _target;
       } else {
         Size _size = getSize(turretImage!);
-        TDBullet _bullet = new TDBullet(
-            x: this.position.x + _size.width / 2,
-            y: this.position.y + _size.height / 2,
-            velocity: 0.1);
+        TDBullet _bullet = new TDBullet(x: this.position.x + _size.width / 2, y: this.position.y + _size.height / 2, velocity: 0.1);
         _bullet.alive = true;
         _bullet.target = _target;
         this.bullets.add(_bullet);
@@ -305,8 +279,7 @@ class TDTower {
   void loadBaseImage() async {
     /// cache these externally
     baseState = "loading";
-    final ByteData data =
-        await rootBundle.load(baseURL + this.baseType + extensionStr);
+    final ByteData data = await rootBundle.load(baseURL + this.baseType + extensionStr);
     baseImage = await Utils.shared.imageFromBytes(data);
     baseTextureWidth = baseImage!.width;
     baseTextureHeight = baseImage!.height;
@@ -316,8 +289,7 @@ class TDTower {
   void loadTurretImage(Function? onComplete) async {
     /// cache these externally
     turretState = "loading";
-    final ByteData data =
-        await rootBundle.load(baseURL + this.turretType + extensionStr);
+    final ByteData data = await rootBundle.load(baseURL + this.turretType + extensionStr);
     turretImage = await Utils.shared.imageFromBytes(data);
     turretTextureWidth = turretImage!.width;
     turretTextureHeight = turretImage!.height;
@@ -392,15 +364,12 @@ class TDTower {
       ..style = PaintingStyle.fill;
 
     rotate(canvas, 0, 0, null, () {
-      canvas.drawLine(Offset(a.x.toDouble(), a.y.toDouble()),
-          Offset(b.x.toDouble(), b.y.toDouble()), _paint);
+      canvas.drawLine(Offset(a.x.toDouble(), a.y.toDouble()), Offset(b.x.toDouble(), b.y.toDouble()), _paint);
       //canvas.drawCircle(Offset(0, 0), radius, _paint);
     }, translate: false);
   }
 
-  void rotate(
-      Canvas canvas, double? x, double? y, double? angle, VoidCallback callback,
-      {bool translate = false}) {
+  void rotate(Canvas canvas, double? x, double? y, double? angle, VoidCallback callback, {bool translate = false}) {
     double _x = x ?? 0;
     double _y = y ?? 0;
     canvas.save();

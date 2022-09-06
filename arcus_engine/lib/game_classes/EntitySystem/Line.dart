@@ -6,8 +6,8 @@
 
 import 'dart:math';
 
-import 'package:arcus_engine/game_classes/EntitySystem/LinePoint.dart';
-import 'package:arcus_engine/helpers/Rectangle.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/line_point.dart';
+import 'package:arcus_engine/helpers/rectangle.dart';
 import 'package:arcus_engine/helpers/utils.dart';
 
 /**
@@ -161,8 +161,7 @@ class Line {
      * @return {Phaser.Point} The intersection segment of the two lines as a Point, or null if there is no intersection.
      */
   intersects(Line line, asSegment) {
-    return intersectsPointsInner(
-        this.start, this.end, line.start, line.end, asSegment);
+    return intersectsPointsInner(this.start, this.end, line.start, line.end, asSegment);
   }
 
   /**
@@ -187,8 +186,7 @@ class Line {
   midPoint() {
     LinePoint out = LinePoint(0, 0);
 
-    out = LinePoint(
-        (this.start.x + this.end.x) / 2, (this.start.y + this.end.y) / 2);
+    out = LinePoint((this.start.x + this.end.x) / 2, (this.start.y + this.end.y) / 2);
 
     return out;
   }
@@ -225,10 +223,7 @@ class Line {
      * @return {boolean} True if the point is on the line, false if not.
      */
   pointOnLine(int x, int y, double? epsilon) {
-    return Utils.shared.fuzzyEqual(
-        (x - this.start.x) * (this.end.y - this.start.y),
-        (this.end.x - this.start.x) * (y - this.start.y),
-        epsilon ?? 0);
+    return Utils.shared.fuzzyEqual((x - this.start.x) * (this.end.y - this.start.y), (this.end.x - this.start.x) * (y - this.start.y), epsilon ?? 0);
   }
 
   /**
@@ -246,9 +241,7 @@ class Line {
     var yMin = min(this.start.y, this.end.y);
     var yMax = max(this.start.y, this.end.y);
 
-    return (this.pointOnLine(x.toInt(), y.toInt(), epsilon) &&
-        (x >= xMin && x <= xMax) &&
-        (y >= yMin && y <= yMax));
+    return (this.pointOnLine(x.toInt(), y.toInt(), epsilon) && (x >= xMin && x <= xMax) && (y >= yMin && y <= yMax));
   }
 
   /**
@@ -265,8 +258,7 @@ class Line {
     var _rand = new Random();
     var t = _rand.nextDouble();
 
-    out = LinePoint(this.start.x + t * (this.end.x - this.start.x),
-        this.start.y + t * (this.end.y - this.start.y));
+    out = LinePoint(this.start.x + t * (this.end.x - this.start.x), this.start.y + t * (this.end.y - this.start.y));
 
     return out;
   }
@@ -329,8 +321,7 @@ class Line {
      * @return {Phaser.Line} The cloned Line object.
      */
   clone() {
-    Line output = Line(
-        x1: this.start.x, y1: this.start.y, x2: this.end.x, y2: this.end.y);
+    Line output = Line(x1: this.start.x, y1: this.start.y, x2: this.end.x, y2: this.end.y);
 
     return output;
   }
@@ -342,9 +333,7 @@ class Line {
  */
 
   double get length {
-    double result = sqrt(
-        (this.end.x - this.start.x) * (this.end.x - this.start.x) +
-            (this.end.y - this.start.y) * (this.end.y - this.start.y));
+    double result = sqrt((this.end.x - this.start.x) * (this.end.x - this.start.x) + (this.end.y - this.start.y) * (this.end.y - this.start.y));
     return result;
   }
 
@@ -511,8 +500,7 @@ class Line {
       return null;
     }
 
-    result =
-        Point(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
+    result = Point(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
 
     if (asSegment) {
       var uc = ((f.y - e.y) * (b.x - a.x) - (f.x - e.x) * (b.y - a.y));
@@ -589,8 +577,7 @@ class Line {
      *  collision, as rects are solid for our use-case.
      */
 
-    if ((x1 >= bx1 && x1 <= bx2 && y1 >= by1 && y1 <= by2) ||
-        (x2 >= bx1 && x2 <= bx2 && y2 >= by1 && y2 <= by2)) {
+    if ((x1 >= bx1 && x1 <= bx2 && y1 >= by1 && y1 <= by2) || (x2 >= bx1 && x2 <= bx2 && y2 >= by1 && y2 <= by2)) {
       return true;
     }
 

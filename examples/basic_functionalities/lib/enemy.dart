@@ -3,14 +3,14 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
-import 'package:arcus_engine/helpers/GameObject.dart';
+import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:vector_math/vector_math.dart' as vectorMath;
 import "package:bezier/bezier.dart";
-import "../../helpers//utils.dart";
-import "../../helpers/Rectangle.dart";
+import 'package:arcus_engine/helpers/utils.dart';
+import 'package:arcus_engine/helpers/rectangle.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
-import '../../helpers/math/CubicBezierInterpolation.dart' as CubicBezierCurve;
+import 'package:arcus_engine/helpers/math/CubicBezierInterpolation.dart' as CubicBezierCurve;
 
 class TDEnemy {
   /// TODO: Define types in ENUM
@@ -56,9 +56,7 @@ class TDEnemy {
   void update(Canvas canvas) {
     if (this.imageState == "done") {
       ticker += this.speed;
-      this.maxCurves = GameObject.shared.cubicBeziers.length > 0
-          ? GameObject.shared.cubicBeziers.length
-          : 0;
+      this.maxCurves = GameObject.shared.cubicBeziers.length > 0 ? GameObject.shared.cubicBeziers.length : 0;
       vectorMath.Vector2 point = vectorMath.Vector2(0, 0);
       if (ticker >= 1.0 && this.curveIndex < this.maxCurves) {
         ticker = 0.0;
@@ -82,10 +80,8 @@ class TDEnemy {
         this.position = Point(point.x, point.y);
       }
 
-      double _angle = Utils.shared
-          .angleBetween(oldValues.x, oldValues.y, position.x, position.y);
-      this.angle =
-          _angle + pi / 2; //vectorMath.radians(_angle + (360 / 3) * 1);
+      double _angle = Utils.shared.angleBetween(oldValues.x, oldValues.y, position.x, position.y);
+      this.angle = _angle + pi / 2; //vectorMath.radians(_angle + (360 / 3) * 1);
 
       if (this.imageState == "done") {
         drawEnemy(canvas);
@@ -117,18 +113,12 @@ class TDEnemy {
         _perc = perc.clamp(0, 1);
       }
 
-      vectorMath.Vector2 p0 =
-          GameObject.shared.cubicBeziers[_index].points()[0];
-      vectorMath.Vector2 p1 =
-          GameObject.shared.cubicBeziers[_index].points()[1];
-      vectorMath.Vector2 p2 =
-          GameObject.shared.cubicBeziers[_index].points()[2];
-      vectorMath.Vector2 p3 =
-          GameObject.shared.cubicBeziers[_index].points()[3];
-      double curveX = CubicBezierCurve.CubicBezierInterpolation(
-          _perc, p0.x, p1.x, p2.x, p3.x);
-      double curveY = CubicBezierCurve.CubicBezierInterpolation(
-          _perc, p0.y, p1.y, p2.y, p3.y);
+      vectorMath.Vector2 p0 = GameObject.shared.cubicBeziers[_index].points()[0];
+      vectorMath.Vector2 p1 = GameObject.shared.cubicBeziers[_index].points()[1];
+      vectorMath.Vector2 p2 = GameObject.shared.cubicBeziers[_index].points()[2];
+      vectorMath.Vector2 p3 = GameObject.shared.cubicBeziers[_index].points()[3];
+      double curveX = CubicBezierCurve.CubicBezierInterpolation(_perc, p0.x, p1.x, p2.x, p3.x);
+      double curveY = CubicBezierCurve.CubicBezierInterpolation(_perc, p0.y, p1.y, p2.y, p3.y);
       return vectorMath.Vector2(curveX, curveY);
       //GameObject.shared.cubicBeziers[_index].pointAt(_perc);
     } else {
@@ -139,8 +129,7 @@ class TDEnemy {
   Future<ui.Image?> loadImage() async {
     /// cache these externally
     imageState = "loading";
-    final ByteData data =
-        await rootBundle.load(baseURL + this.type + extensionStr);
+    final ByteData data = await rootBundle.load(baseURL + this.type + extensionStr);
     textureImage = await Utils.shared.imageFromBytes(data);
     this.textureWidth = textureImage!.width;
     this.textureHeight = textureImage!.height;
@@ -186,8 +175,7 @@ class TDEnemy {
       canvas.drawImageRect(
         this.enemyTexture!,
         Rect.fromLTWH(0, 0, textureWidth.toDouble(), textureHeight.toDouble()),
-        Rect.fromLTWH(
-            -size.width / 2, -size.height / 2, size.width, size.height),
+        Rect.fromLTWH(-size.width / 2, -size.height / 2, size.width, size.height),
         paint,
       );
     });
@@ -223,9 +211,7 @@ class TDEnemy {
     }, translate: true);
   }
 
-  void updateCanvas(
-      Canvas canvas, double? x, double? y, double? angle, VoidCallback callback,
-      {bool translate = false}) {
+  void updateCanvas(Canvas canvas, double? x, double? y, double? angle, VoidCallback callback, {bool translate = false}) {
     double _x = x ?? 0;
     double _y = y ?? 0;
     canvas.save();
@@ -244,20 +230,12 @@ class TDEnemy {
 
   Rectangle getEnemyRect() {
     Size _size = getEnemySize();
-    return Rectangle(
-        x: this.position.x,
-        y: this.position.y,
-        width: _size.width,
-        height: _size.height);
+    return Rectangle(x: this.position.x, y: this.position.y, width: _size.width, height: _size.height);
   }
 
   Rectangle getBounds() {
     Size _size = getEnemySize();
-    return Rectangle(
-        x: this.position.x,
-        y: this.position.y,
-        width: _size.width,
-        height: _size.height);
+    return Rectangle(x: this.position.x, y: this.position.y, width: _size.width, height: _size.height);
   }
 
   Point<double> get enemyPosition {
@@ -275,8 +253,7 @@ class TDEnemy {
   Point<double> get enemyCenter {
     Size size = this.getEnemySize();
 
-    return Point(this.position.x + (size.width / 2),
-        this.position.y + (size.height / 2));
+    return Point(this.position.x + (size.width / 2), this.position.y + (size.height / 2));
   }
 
   Point<double> get enemyCenterRotated {
@@ -302,7 +279,6 @@ class TDEnemy {
     var rotatedWidth = maxX - minX;
     var rotatedHeight = maxY - minY;
 
-    return Point(this.position.x + (rotatedWidth / 2),
-        this.position.y + (rotatedHeight / 2));
+    return Point(this.position.x + (rotatedWidth / 2), this.position.y + (rotatedHeight / 2));
   }
 }

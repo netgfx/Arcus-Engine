@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:arcus_engine/game_classes/EntitySystem/particle.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
-import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
-import 'package:arcus_engine/helpers/GameObject.dart';
+import 'package:arcus_engine/helpers/vector_little.dart';
+import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';

@@ -2,9 +2,9 @@ import "dart:math";
 import "dart:ui";
 
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
-import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
+import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
-import 'package:arcus_engine/helpers/GameObject.dart';
+import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

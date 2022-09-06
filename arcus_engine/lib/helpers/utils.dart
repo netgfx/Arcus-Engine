@@ -9,9 +9,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_native_image/flutter_native_image.dart' as uiImage;
 import 'package:arcus_engine/game_classes/EntitySystem/sprite_archetype.dart';
 import 'package:arcus_engine/helpers/Circle.dart';
-import 'package:arcus_engine/helpers/Rectangle.dart';
+import 'package:arcus_engine/helpers/rectangle.dart';
 import 'package:vector_math/vector_math.dart';
-import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart' as vector2;
+import 'package:arcus_engine/helpers/vector_little.dart' as vector2;
 
 enum Easing {
   LINEAR,
@@ -881,6 +881,16 @@ class Utils {
 
   randSign() {
     return (rand(a: 2) | 0) * 2 - 1;
+  }
+
+  /** Returns what percentage the value is between max and min
+ *  @param {Number} value
+ *  @param {Number} [min=0]
+ *  @param {Number} [max=1]
+ *  @return {Number}
+ *  @memberof Utilities */
+  double percent(v, {min = 0, max = 1}) {
+    return max - min ? clamp((v - min) / (max - min), 0, 1) : 0;
   }
 }
 

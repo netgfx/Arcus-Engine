@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:arcus_engine/helpers/Rectangle.dart';
+import 'package:arcus_engine/helpers/rectangle.dart';
 import 'package:arcus_engine/helpers/sprite_cache.dart';
 
 import '../../helpers/utils.dart';
@@ -21,8 +21,7 @@ class TDWorld {
   }
 
   List<dynamic> getEngineObjectsCollide() {
-    return engineObjectsCollide =
-        this.displayList.where((o) => o.physicsBody != null).toList();
+    return engineObjectsCollide = this.displayList.where((o) => o.physicsBody != null).toList();
   }
 
   set cache(SpriteCache value) {
@@ -109,12 +108,10 @@ class TDWorld {
   void checkCollisions(List<Map<String, dynamic>> colliders) {
     int length = colliders.length;
     for (var i = 0; i < length; i++) {
-      if (colliders[i]['a'].type == "solo" &&
-          colliders[i]['b'].type == "solo") {
+      if (colliders[i]['a'].type == "solo" && colliders[i]['b'].type == "solo") {
         var objA = this.displayList[this.dictionary[colliders[i]['a'].name]!];
         var objB = this.displayList[this.dictionary[colliders[i]['b'].name]!];
-        bool result =
-            Utils.shared.intersects(objA.getBounds(), objB.getBounds());
+        bool result = Utils.shared.intersects(objA.getBounds(), objB.getBounds());
         //print(result);
       }
     }

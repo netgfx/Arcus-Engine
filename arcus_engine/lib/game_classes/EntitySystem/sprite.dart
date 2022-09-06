@@ -5,13 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/sprite_archetype.dart';
-import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
-import 'package:arcus_engine/helpers/GameObject.dart';
+import 'package:arcus_engine/helpers/vector_little.dart';
+import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/sprite_cache.dart';
 import 'package:vector_math/vector_math.dart' as vectorMath;
 import "package:bezier/bezier.dart";
 import "../../helpers/utils.dart";
-import "../../helpers/Rectangle.dart";
+import '../../helpers/rectangle.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 

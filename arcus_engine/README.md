@@ -23,9 +23,9 @@
 - Custom events on canvas elements 🏭 (click is working, need to support drag also and hover)
   - check effects to use centered pos when clicked (could be a self property like `useCenterPosition=true`)
 - keyboard events (https://api.flutter.dev/flutter/widgets/KeyboardListener-class.html)
+- Add drag event
 - Depth sorting ✔️
   - Event honoring depth, so only first is supported ✔️
-  - Make drag event
 - Tweens 🏭
   - Add enumerable properties e.g (x, y) or make it read dot notation
   - Tween working with item Id now (so all items should have an id)
@@ -44,7 +44,11 @@
   - Might need some preloading work or cache
   - Add global mute 🧪
 - Shapes ✔️
+  - Add gradient support
 - Group component 🏭
+  - Add alignment options
+  - Flex spacing
+  - Add a stack component !?
 - Plugin template 🏭
 - Proper tilemap and culling
 - Autoscroll tile-sprite
@@ -54,6 +58,7 @@
   - need to test moving sprite
 - Get name for library... ❗
   - Arcus ✔️
+- Documentation ❗
 
 ### Sample games for v0.1
 

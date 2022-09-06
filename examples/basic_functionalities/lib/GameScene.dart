@@ -6,7 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:arcus_engine/game_classes/EntitySystem/particle_emitter.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
-import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
+import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:arcus_engine/helpers/sound_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -267,6 +267,18 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     actions.sendClick(details.localPosition.dx, details.localPosition.dy);
   }
 
+  void onPanStart(BuildContext context, DragStartDetails details) {
+    actions.sendDragStart(details.localPosition.dx, details.localPosition.dy);
+  }
+
+  void onPanUpdate(BuildContext context, DragUpdateDetails details) {
+    actions.sendDragMove(details.localPosition.dx, details.localPosition.dy);
+  }
+
+  void onPanEnd(BuildContext context, DragEndDetails details) {
+    actions.sendDragEnd();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomPerformanceOverlay(
@@ -277,6 +289,9 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTapDown: (details) => onTap(context, details),
+              onPanStart: (details) => onPanStart(context, details),
+              onPanUpdate: (details) => onPanUpdate(context, details),
+              onPanEnd: (details) => onPanEnd(context, details),
               child: Stack(children: [
                 this.cacheReady == false
                     ? Center(
@@ -288,16 +303,16 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
                         top: 0,
                         left: 0,
                         child: Padding(
-                          padding: EdgeInsets.only(top: 0, left: 0),
+                          padding: const EdgeInsets.only(top: 0, left: 0),
                           child: Stack(children: [
                             CustomPaint(
                               key: UniqueKey(),
                               painter: SpriteDriverCanvas(
                                 controller: _controller,
                                 fps: 30,
-                                sprites: this.spritesArr,
-                                cache: this.cache,
-                                actions: this.cache.isEmpty() ? null : actions,
+                                sprites: spritesArr,
+                                cache: cache,
+                                actions: cache.isEmpty() ? null : actions,
                                 width: viewportConstraints.maxWidth,
                                 height: viewportConstraints.maxHeight,
                                 cameraProps: CameraProps(
@@ -307,8 +322,8 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
                                     viewportConstraints.maxHeight,
                                   ),
                                   mapSize: Size(viewportConstraints.maxWidth, viewportConstraints.maxHeight),
-                                  followObject: Rect.fromLTWH(200.0, 180.0, 80, 80),
-                                  offset: Point<double>(0.0, 0.0),
+                                  followObject: const Rect.fromLTWH(200.0, 180.0, 80, 80),
+                                  offset: const Point<double>(0.0, 0.0),
                                 ),
                               ),
                             ),

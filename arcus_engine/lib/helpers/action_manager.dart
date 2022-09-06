@@ -39,8 +39,8 @@ class ActionManager {
     actionController.add({"type": PointerEvents.DRAG_MOVE, "data": Point<double>(x, y)});
   }
 
-  sendDragEnd(double x, double y) {
-    actionController.add({"type": PointerEvents.DRAG_END, "data": Point<double>(x, y)});
+  sendDragEnd() {
+    actionController.add({"type": PointerEvents.DRAG_END, "data": null});
   }
 
   sendTop() {

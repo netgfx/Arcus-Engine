@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
-import 'package:arcus_engine/game_classes/EntitySystem/vector_little.dart';
+import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:arcus_engine/helpers/constants.dart';
 import 'package:arcus_engine/helpers/utils.dart';
 

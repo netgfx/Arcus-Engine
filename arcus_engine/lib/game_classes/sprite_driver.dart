@@ -8,12 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'package:arcus_engine/game_classes/EntitySystem/Camera.dart';
-import 'package:arcus_engine/game_classes/EntitySystem/enemy.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/sprite_animator.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/sprite_archetype.dart';
-import 'package:arcus_engine/helpers/GameObject.dart';
-import 'package:arcus_engine/helpers/Rectangle.dart';
+import 'package:arcus_engine/helpers/game_object.dart';
+import 'package:arcus_engine/helpers/rectangle.dart';
 import 'package:arcus_engine/helpers/action_manager.dart';
 import 'package:arcus_engine/helpers/math/CubicBezier.dart';
 import 'package:arcus_engine/helpers/sprite_cache.dart';
@@ -34,7 +33,6 @@ class SpriteDriverCanvas extends CustomPainter {
   int fps = 24;
   int printTime = DateTime.now().millisecondsSinceEpoch;
   int timeDecay = 0;
-  final _random = new Random();
   int timeToLive = 24;
   double width = 100;
   double height = 100;
@@ -42,20 +40,17 @@ class SpriteDriverCanvas extends CustomPainter {
   var computedPoint = vectorMath.Vector2(0, 0);
   double computedAngle = 0.0;
   List<List<vectorMath.Vector2>> curve = [];
-  List<CubicBezier> quadBeziers = [];
   Function? update;
-  Paint _paint = new Paint();
-  List<TDEnemy> enemies = [];
-  BoxConstraints sceneSize = BoxConstraints(minWidth: 800, maxWidth: 1600, minHeight: 450, maxHeight: 900);
+  BoxConstraints sceneSize = const BoxConstraints(minWidth: 800, maxWidth: 1600, minHeight: 450, maxHeight: 900);
 
   ActionManager? actions;
   SpriteCache cache;
-  var listenable;
+  late var listenable;
   Rectangle worldBounds = Rectangle(x: 0, y: 0, width: 0, height: 0);
-  TDWorld? _world = null;
+  TDWorld? _world;
   List<dynamic> sprites = [];
   bool shouldCheckEvent = false;
-  Point<double> eventPoint = Point(0, 0);
+  Point<double> eventPoint = const Point(0, 0);
   Camera? _camera;
   CameraProps? cameraProps;
   //
