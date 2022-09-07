@@ -31,6 +31,11 @@
   - Tween working with item Id now (so all items should have an id)
 - Sprite rotation
 - Pooling 🚩
+- Add text object support 🧪
+  - Styles (fonts, color simple, size, etc) 🧪
+  - Color gradient 🧪
+  - Physics !?
+  - Dynamic 🧪
 - port Arcade physics ❗
   - Simple physics 🏭
   - generalize the collision 🏭
