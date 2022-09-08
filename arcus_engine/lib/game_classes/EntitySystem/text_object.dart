@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:flutter/material.dart';
 
-class Text {
+class TextObject {
   String text = "";
   Vector2 position = Vector2(x: 0, y: 0);
   Size size = const Size(0, 0);
@@ -20,10 +20,11 @@ class Text {
   late Offset gradientOffsetEnd;
   late List<Color> gradientColors;
   late String fontFamily;
-  double maxWidth = 0.0;
+  double maxWidth = 100.0;
   double maxHeight = 0.0;
   int maxLines = 10;
   late Paint paint;
+  late Paint foregroundPaint;
   Function? _onEvent;
   bool _interactive = false;
   String id = UniqueKey().toString();
@@ -34,7 +35,7 @@ class Text {
   double angle = 0.0;
 
   /// constructor
-  Text({
+  TextObject({
     required this.text,
     required this.position,
     fontWeight,
@@ -60,6 +61,7 @@ class Text {
     this.fontWeight = fontWeight ?? FontWeight.normal;
     this.fontStyle = fontStyle ?? FontStyle.normal;
     this.opacity = opacity ?? 1;
+    this.fontSize = fontSize ?? 16;
     this.color = color ?? Colors.black;
     this.border = border ?? false;
     this.borderWidth = borderWidth ?? 0;
@@ -69,11 +71,14 @@ class Text {
     this.gradientColors = gradientColors ?? [];
     alive = startAlive ?? false;
     this.zIndex = zIndex ?? 0;
-    this.maxWidth = maxWidth ?? 0;
-    this.maxHeight = maxHeight ?? 0;
+    this.maxWidth = maxWidth ?? 100;
+    this.maxHeight = maxHeight ?? 100;
     this.maxLines = maxLines ?? 10;
     this.angle = angle ?? 0.0;
     paint = Paint();
+    foregroundPaint = Paint();
+
+    foregroundPaint.color = this.color.withOpacity(this.opacity);
 
     // bordered
     if (border) {
@@ -84,8 +89,16 @@ class Text {
     }
 
     /// text constructors
-    textSpan = TextSpan(text: text, style: TextStyle());
-    textPainter = TextPainter(text: textSpan, maxLines: maxLines);
+    textSpan = TextSpan(
+        text: text,
+        style: TextStyle(
+          //backgroundColor: Colors.black,
+          foreground: paint,
+          fontSize: this.fontSize,
+          fontStyle: this.fontStyle,
+          fontWeight: this.fontWeight,
+        ));
+    textPainter = TextPainter(text: textSpan, maxLines: maxLines, textDirection: TextDirection.ltr);
 
     performLayout();
   }
@@ -120,7 +133,7 @@ class Text {
   }
 
   performLayout() {
-    textPainter.layout(minWidth: 0, maxWidth: maxWidth);
+    textPainter.layout(minWidth: 10.0, maxWidth: maxWidth);
     size = textPainter.size;
   }
 
@@ -149,8 +162,8 @@ class Text {
     /// calculate layout based on any possible changes between
     /// previous update and this one
     performLayout();
-    updateCanvas(canvas, position.x, position.y, angle, () {
-      textPainter.paint(canvas, Offset.zero);
+    updateCanvas(canvas, 0, 0, angle, () {
+      textPainter.paint(canvas, Offset(position.x, position.y));
     });
   }
 

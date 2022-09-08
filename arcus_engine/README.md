@@ -31,10 +31,11 @@
   - Tween working with item Id now (so all items should have an id)
 - Sprite rotation
 - Pooling 🚩
-- Add text object support 🧪
-  - Styles (fonts, color simple, size, etc) 🧪
+- Add text object support ✔️
+  - Styles (fonts, color simple, size, etc) ✔️
   - Color gradient 🧪
   - Physics !?
+  - Bordered with fill (need to do some hacking in there) 🏭
   - Dynamic 🧪
 - port Arcade physics ❗
   - Simple physics 🏭

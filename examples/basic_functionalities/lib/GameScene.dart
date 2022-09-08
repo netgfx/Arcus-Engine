@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:arcus_engine/game_classes/EntitySystem/particle_emitter.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/text_object.dart';
 import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:arcus_engine/helpers/sound_manager.dart';
 import 'package:flutter/material.dart';
@@ -205,21 +206,34 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         },
         interactive: true,
       ),
-      ParticleEmitter(
-          pos: Vector2(x: 200.0, y: 300.0),
-          emitSize: Vector2(x: 36, y: 36),
-          emitTime: 0.1,
-          emitRate: 200,
-          emitConeAngle: pi,
-          startColor: const Color.fromRGBO(255, 0, 128, 1),
-          endColor: const Color.fromRGBO(255, 0, 0, 1),
-          particleTime: 0.2,
-          fadeRate: 0.1,
-          randomness: 1,
-          collideTiles: true,
-          randomColorLinear: 0,
-          renderOrder: 1,
-          startAlive: true),
+      TextObject(
+        text: "Hello Arcus!",
+        position: Vector2(x: 300, y: 250),
+        fontSize: 56,
+        color: Colors.green,
+        startAlive: true,
+        zIndex: 1,
+        maxLines: 1,
+        border: true,
+        borderWidth: 1,
+        borderColor: Colors.orange,
+        maxWidth: 400,
+      ),
+      // ParticleEmitter(
+      //     pos: Vector2(x: 200.0, y: 300.0),
+      //     emitSize: Vector2(x: 36, y: 36),
+      //     emitTime: 0.1,
+      //     emitRate: 200,
+      //     emitConeAngle: pi,
+      //     startColor: const Color.fromRGBO(255, 0, 128, 1),
+      //     endColor: const Color.fromRGBO(255, 0, 0, 1),
+      //     particleTime: 0.2,
+      //     fadeRate: 0.1,
+      //     randomness: 1,
+      //     collideTiles: true,
+      //     randomColorLinear: 0,
+      //     renderOrder: 1,
+      //     startAlive: true),
       // ShapeMaker(
       //   type: ShapeType.Rect,
       //   position: const Point<double>(200.0, 250.0),
