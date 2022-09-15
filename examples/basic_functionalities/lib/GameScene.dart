@@ -7,6 +7,8 @@ import 'dart:ui' as ui;
 import 'package:arcus_engine/game_classes/EntitySystem/particle_emitter.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/text_object.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
+import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:arcus_engine/helpers/sound_manager.dart';
 import 'package:flutter/material.dart';
@@ -184,41 +186,23 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         zIndex: 2,
         startAlive: true,
         fps: 24,
-        onEvent: (Point event, SpriteArchetype sprite) => {
-          print("I'm tapped!!!"),
-          SoundManager.shared.playTrack("click"),
-          // _tween.addTween(
-          //   TweenOptions(
-          //     target: "bat",
-          //     collection: sprites,
-          //     property: "scale",
-          //     to: 0.8,
-          //     autostart: true,
-          //     animationProperties: AnimationProperties(
-          //       duration: 2000,
-          //       delay: 0,
-          //       ease: Curves.easeOutBack,
-          //     ),
-          //   ),
-          //   () => {print("tween complete!")},
-          //   null,
-          // )
-        },
+        onEvent: (Point event, SpriteArchetype sprite) => changeText(),
         interactive: true,
       ),
       TextObject(
-        text: "Hello Arcus!",
-        position: Vector2(x: 300, y: 250),
-        fontSize: 56,
-        color: Colors.green,
-        startAlive: true,
-        zIndex: 1,
-        maxLines: 1,
-        border: true,
-        borderWidth: 1,
-        borderColor: Colors.orange,
-        maxWidth: 400,
-      ),
+          id: "mainText",
+          text: "Hello Arcus!",
+          position: Vector2(x: 300, y: 250),
+          fontSize: 56,
+          color: Colors.green,
+          startAlive: true,
+          zIndex: 1,
+          maxLines: 2,
+          border: true,
+          borderWidth: 1,
+          borderColor: Colors.orange,
+          maxWidth: 400,
+          fontFamily: "IrishGrover"),
       // ParticleEmitter(
       //     pos: Vector2(x: 200.0, y: 300.0),
       //     emitSize: Vector2(x: 36, y: 36),
@@ -255,6 +239,34 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     setState(() {
       spritesArr = sprites;
     });
+  }
+
+  void changeText() {
+    print("I'm tapped!!!");
+    TDWorld? world = GameObject.shared.getWorld();
+    if (world != null) {
+      List<dynamic> text = world.getObjectById("mainText");
+      if (text.length > 0) {
+        (text[0] as TextObject).setText("${text[0].text}!");
+      }
+    }
+    SoundManager.shared.playTrack("click");
+    // _tween.addTween(
+    //   TweenOptions(
+    //     target: "bat",
+    //     collection: sprites,
+    //     property: "scale",
+    //     to: 0.8,
+    //     autostart: true,
+    //     animationProperties: AnimationProperties(
+    //       duration: 2000,
+    //       delay: 0,
+    //       ease: Curves.easeOutBack,
+    //     ),
+    //   ),
+    //   () => {print("tween complete!")},
+    //   null,
+    // )
   }
 
   void playFly() {

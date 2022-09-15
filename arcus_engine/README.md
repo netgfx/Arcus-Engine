@@ -62,7 +62,7 @@
 - Camera 🏭
   - need to test with scrolling sprite (WIP)
   - need to test moving sprite
-- Get name for library... ❗
+- Get name for library... ✔️❗
   - Arcus ✔️
 - Documentation ❗
 

@@ -38,6 +38,7 @@ class TextObject {
   TextObject({
     required this.text,
     required this.position,
+    id,
     fontWeight,
     fontStyle,
     opacity,
@@ -58,10 +59,12 @@ class TextObject {
     maxLines,
     angle,
   }) {
+    this.id = id ?? UniqueKey().toString();
     this.fontWeight = fontWeight ?? FontWeight.normal;
     this.fontStyle = fontStyle ?? FontStyle.normal;
     this.opacity = opacity ?? 1;
     this.fontSize = fontSize ?? 16;
+    this.fontFamily = fontFamily ?? "RobotoMono";
     this.color = color ?? Colors.black;
     this.border = border ?? false;
     this.borderWidth = borderWidth ?? 0;
@@ -88,6 +91,11 @@ class TextObject {
         ..color = borderColor;
     }
 
+    _applyText();
+    performLayout();
+  }
+
+  _applyText() {
     /// text constructors
     textSpan = TextSpan(
         text: text,
@@ -97,10 +105,9 @@ class TextObject {
           fontSize: this.fontSize,
           fontStyle: this.fontStyle,
           fontWeight: this.fontWeight,
+          fontFamily: this.fontFamily,
         ));
     textPainter = TextPainter(text: textSpan, maxLines: maxLines, textDirection: TextDirection.ltr);
-
-    performLayout();
   }
 
   setText(String value) {
@@ -161,6 +168,7 @@ class TextObject {
 
     /// calculate layout based on any possible changes between
     /// previous update and this one
+    _applyText();
     performLayout();
     updateCanvas(canvas, 0, 0, angle, () {
       textPainter.paint(canvas, Offset(position.x, position.y));

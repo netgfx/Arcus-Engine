@@ -24,6 +24,11 @@ class TDWorld {
     return engineObjectsCollide = this.displayList.where((o) => o.physicsBody != null).toList();
   }
 
+  List<dynamic> getObjectById(String id) {
+    var result = displayList.where((element) => element.id == id).toList();
+    return result;
+  }
+
   set cache(SpriteCache value) {
     this._cache = value;
   }
@@ -79,7 +84,7 @@ class TDWorld {
     int length = _displayList.length;
     for (var i = 0; i < length; i++) {
       if (_displayList[i].alive == true) {
-        _displayList[i].update(this.canvas);
+        _displayList[i].update(canvas);
       }
     }
   }
