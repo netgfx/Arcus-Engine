@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:arcus_engine/helpers/game_object.dart';
+
 class GroupController {
   Point<double> position = Point(0, 0);
   Size _size = Size(0, 0);
@@ -139,21 +141,28 @@ class GroupController {
       item["object"].update(canvas, elapsedTime: elapsedTime, shouldUpdate: shouldUpdate);
     }
     this.size = _calculateSize();
+
     if (enableDebug == true) {
       drawDebugRect(canvas);
     }
   }
 
   void drawDebugRect(Canvas canvas) {
+    /// get camera position
+    Rect cameraPos = Rect.fromLTWH(0, 0, 0, 0);
+    if (GameObject.shared.world != null) {
+      cameraPos = GameObject.shared.world!.getCamera().getCameraBounds();
+    }
+
     final Paint border = Paint()
       ..color = Color.fromRGBO(0, 255, 0, 1.0)
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.square
       ..strokeWidth = 2;
-    updateCanvas(canvas, 0, 0, null, () {
+    updateCanvas(canvas, (cameraPos.left * -1), (cameraPos.top * -1), null, () {
       //print("group size is: ${this.size.width}, ${this.size.height}");
       canvas.drawRect(Rect.fromLTWH(this.position.x, this.position.y, this.size.width, this.size.height), border);
-    });
+    }, translate: true);
   }
 
   void updateCanvas(Canvas canvas, double? x, double? y, double? rotate, VoidCallback callback, {bool translate = false}) {
