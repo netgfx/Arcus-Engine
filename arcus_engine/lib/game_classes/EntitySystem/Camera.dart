@@ -17,39 +17,30 @@ class CameraProps {
     followObject,
   }) {
     //print("${followObject.left} ${followObject.top}");
-    this.followObject = followObject;
-    this.offset = offset ?? Point(0.0, 0.0);
+    followObject = followObject;
+    this.offset = offset ?? const Point(0.0, 0.0);
   }
 }
 
 class Camera {
   double x;
   double y;
-  Point<double> offset = Point<double>(0.0, 0.0);
+  Point<double> offset = const Point<double>(0.0, 0.0);
   CameraProps cameraProps;
 
-  Camera(
-      {required this.x, required this.y, required this.cameraProps, offset}) {
-    this.offset = offset ?? Point<double>(0.0, 0.0);
+  Camera({required this.x, required this.y, required this.cameraProps, offset}) {
+    this.offset = offset ?? const Point<double>(0.0, 0.0);
   }
 
   void update() {
-    this.focus();
+    focus();
   }
 
   focus() {
     // Account for half of player w/h to make their rectangle centered
-    this.x = this.clamp(
-        cameraProps.followObject.left -
-            cameraProps.canvasSize.width / 2 +
-            cameraProps.followObject.width / 2,
-        0,
+    x = clamp(cameraProps.followObject.position.x - cameraProps.canvasSize.width / 2 + cameraProps.followObject.size.width / 2, 0,
         cameraProps.mapSize.width - cameraProps.canvasSize.width);
-    this.y = this.clamp(
-        cameraProps.followObject.top -
-            cameraProps.canvasSize.height / 2 +
-            cameraProps.followObject.height / 2,
-        0,
+    y = clamp(cameraProps.followObject.position.y - cameraProps.canvasSize.height / 2 + cameraProps.followObject.size.height / 2, 0,
         cameraProps.mapSize.height - cameraProps.canvasSize.height);
   }
 
@@ -64,7 +55,6 @@ class Camera {
   }
 
   Rect getCameraBounds() {
-    return Rect.fromLTWH(this.offset.x + this.x, this.offset.y + this.y,
-        this.cameraProps.canvasSize.width, this.cameraProps.canvasSize.height);
+    return Rect.fromLTWH(offset.x + x, offset.y + y, cameraProps.canvasSize.width, cameraProps.canvasSize.height);
   }
 }

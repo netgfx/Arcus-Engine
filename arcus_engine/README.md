@@ -36,7 +36,7 @@
   - Color gradient 🧪
   - Physics !?
   - Bordered with fill (need to do some hacking in there) 🏭
-  - Dynamic 🧪
+  - Dynamic ✔️
 - port Arcade physics ❗
   - Simple physics 🏭
   - generalize the collision 🏭
@@ -62,6 +62,9 @@
 - Camera 🏭
   - need to test with scrolling sprite (WIP)
   - need to test moving sprite
+  - Add a cursor class to track user movement and feed that to Camera
+    - size
+    - position
 - Get name for library... ✔️❗
   - Arcus ✔️
 - Documentation ❗
