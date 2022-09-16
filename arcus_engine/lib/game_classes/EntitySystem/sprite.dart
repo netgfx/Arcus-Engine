@@ -138,10 +138,16 @@ class Sprite with SpriteArchetype {
       ..filterQuality = FilterQuality.high
       ..isAntiAlias = false;
 
+    /// get camera position
+    Rect cameraPos = Rect.fromLTWH(0, 0, 0, 0);
+    if (GameObject.shared.world != null) {
+      cameraPos = GameObject.shared.world!.getCamera().getCameraBounds();
+    }
+
     if (_fitParent == true) {
       Size fitSize = Size(size.width, size.height);
 
-      updateCanvas(canvas, position.x, position.y, scale, () {
+      updateCanvas(canvas, position.x + (cameraPos.left * -1), position.y + (cameraPos.top * -1), scale, () {
         if (GameObject.shared.world != null) {
           Size bounds = GameObject.shared.getWorld()!.worldBounds;
           final FittedSizes sizes = applyBoxFit(BoxFit.cover, size, bounds);
@@ -155,12 +161,12 @@ class Sprite with SpriteArchetype {
         position.x - textureWidth.toDouble() * scale * _centerOffset.dx,
         position.y - textureHeight.toDouble() * scale * _centerOffset.dy,
       );
-      renderSprite(canvas, pos, paint);
+      renderSprite(canvas, pos, cameraPos, paint);
     }
   }
 
-  void renderSprite(Canvas canvas, Point<double> pos, Paint paint) {
-    updateCanvas(canvas, position.x, position.y, scale, () {
+  void renderSprite(Canvas canvas, Point<double> pos, Rect cameraPos, Paint paint) {
+    updateCanvas(canvas, pos.x + cameraPos.left * -1, pos.y + cameraPos.top * -1, scale, () {
       canvas.drawImageRect(
         texture!,
         Rect.fromLTWH(0, 0, textureWidth.toDouble(), textureHeight.toDouble()),

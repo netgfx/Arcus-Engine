@@ -71,7 +71,7 @@ class SpriteDriverCanvas extends CustomPainter {
   }) : super(repaint: controller) {
     /// the delay in ms based on desired fps
     timeDecay = (1 / fps * 1000).round();
-    cameraProps = cameraProps;
+    this.cameraProps = cameraProps;
 
     /// calculate world bounds
     worldBounds = Rectangle(x: 0, y: 0, width: width, height: height);
@@ -80,7 +80,6 @@ class SpriteDriverCanvas extends CustomPainter {
       _world = TDWorld();
       _world!.worldBounds = Size(worldBounds.width, worldBounds.height);
       _world!.displayList = sprites;
-      GameObject.shared.setWorld(_world!);
     }
     GameObject.shared.setSpriteCache(cache);
 
@@ -92,9 +91,15 @@ class SpriteDriverCanvas extends CustomPainter {
           cameraProps: this.cameraProps!,
           offset: Point<double>(this.cameraProps!.offset.x, this.cameraProps!.offset.y),
         );
+
+        _world?.setCamera(_camera!);
       }
     }
 
+    /// after it is complete with references
+    if (_world != null) {
+      GameObject.shared.setWorld(_world!);
+    }
     // end of constructor
   }
 
@@ -125,7 +130,12 @@ class SpriteDriverCanvas extends CustomPainter {
       if (controller!.lastElapsedDuration != null) {
         // camera
         if (_camera != null) {
-          canvas.clipRect(Rect.fromLTWH(cameraProps!.offset.x, cameraProps!.offset.y, _camera!.getCameraBounds().width, _camera!.getCameraBounds().height));
+          canvas.clipRect(Rect.fromLTWH(
+            cameraProps!.offset.x,
+            cameraProps!.offset.y,
+            _camera!.getCameraBounds().width,
+            _camera!.getCameraBounds().height,
+          ));
           //Rect bounds = _camera!.getCameraBounds();
         }
         var lastElapsed = (controller!.lastElapsedDuration!.inMilliseconds - oldTimestamp) / 1000;
@@ -223,7 +233,7 @@ class SpriteDriverCanvas extends CustomPainter {
     // update camera
     if (_camera != null) {
       _camera!.update();
-      //print("${this._camera!.getCameraBounds()}");
+      //print("${_camera!.getCameraBounds()} ${GameObject.shared.world!.getCamera().getCameraBounds()}");
     }
   }
 

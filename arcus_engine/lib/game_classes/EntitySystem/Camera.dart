@@ -1,13 +1,15 @@
 import 'dart:math';
 import 'dart:ui';
+import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
+import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:vector_math/vector_math.dart' as vectorMath;
 
 class CameraProps {
   bool enabled = false;
-  Size canvasSize = Size(0, 0);
+  Size canvasSize = const Size(0, 0);
   dynamic followObject;
-  Size mapSize = Size(0, 0);
-  Point<double> offset = Point(0.0, 0.0);
+  Size mapSize = const Size(0, 0);
+  Point<double> offset = const Point(0.0, 0.0);
 
   CameraProps({
     required this.enabled,
@@ -17,7 +19,7 @@ class CameraProps {
     followObject,
   }) {
     //print("${followObject.left} ${followObject.top}");
-    followObject = followObject;
+    this.followObject = followObject;
     this.offset = offset ?? const Point(0.0, 0.0);
   }
 }
@@ -37,11 +39,26 @@ class Camera {
   }
 
   focus() {
-    // Account for half of player w/h to make their rectangle centered
-    x = clamp(cameraProps.followObject.position.x - cameraProps.canvasSize.width / 2 + cameraProps.followObject.size.width / 2, 0,
-        cameraProps.mapSize.width - cameraProps.canvasSize.width);
-    y = clamp(cameraProps.followObject.position.y - cameraProps.canvasSize.height / 2 + cameraProps.followObject.size.height / 2, 0,
-        cameraProps.mapSize.height - cameraProps.canvasSize.height);
+    if (cameraProps.followObject != null) {
+      var followObject = cameraProps.followObject;
+
+      /// get the follow object by ID
+      if (followObject is String) {
+        TDWorld? world = GameObject.shared.getWorld();
+        if (world != null) {
+          List<dynamic> objects = world.getObjectById(followObject);
+          if (objects.isNotEmpty) {
+            followObject = objects[0];
+          }
+        }
+      }
+
+      // Account for half of player w/h to make their rectangle centered
+      x = clamp(followObject.position.x - cameraProps.canvasSize.width / 2 + followObject.size.width / 2, 0,
+          cameraProps.mapSize.width - cameraProps.canvasSize.width);
+      y = clamp(followObject.position.y - cameraProps.canvasSize.height / 2 + followObject.size.height / 2, 0,
+          cameraProps.mapSize.height - cameraProps.canvasSize.height);
+    }
   }
 
   double clamp(double coord, double min, double max) {

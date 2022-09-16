@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:arcus_engine/game_classes/EntitySystem/Camera.dart';
 import 'package:arcus_engine/helpers/rectangle.dart';
 import 'package:arcus_engine/helpers/sprite_cache.dart';
 
@@ -14,6 +15,7 @@ class TDWorld {
   Canvas? _canvas = null;
   SpriteCache _cache = SpriteCache();
   Size _worldBounds = Size(0, 0);
+  late Camera worldCamera;
   List<dynamic> engineObjectsCollide = [];
 
   TDWorld() {
@@ -27,6 +29,14 @@ class TDWorld {
   List<dynamic> getObjectById(String id) {
     var result = displayList.where((element) => element.id == id).toList();
     return result;
+  }
+
+  setCamera(Camera value) {
+    worldCamera = value;
+  }
+
+  Camera getCamera() {
+    return worldCamera;
   }
 
   set cache(SpriteCache value) {

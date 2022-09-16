@@ -87,6 +87,13 @@ class SpriteAnimator with SpriteArchetype {
       if (this.texture == null) {
         setCache();
       }
+
+      /// get camera position
+      Rect cameraPos = Rect.fromLTWH(0, 0, 0, 0);
+      if (GameObject.shared.world != null) {
+        cameraPos = GameObject.shared.world!.getCamera().getCameraBounds();
+      }
+
       var img = spriteData[currentFrame]![currentIndex];
       Point<double> pos =
           Point(position.x - img["width"].toDouble() * scale * _centerOffset.dx, position.y - img["height"].toDouble() * scale * _centerOffset.dy);
@@ -112,7 +119,7 @@ class SpriteAnimator with SpriteArchetype {
         /// reset the time
         this.currentTime = elapsedTime.round();
 
-        renderSprite(canvas, pos, img);
+        renderSprite(canvas, pos, cameraPos, img);
 
         if (shouldUpdate) {
           currentIndex++;
@@ -125,7 +132,7 @@ class SpriteAnimator with SpriteArchetype {
           currentIndex = 0;
         }
       } else {
-        renderSprite(canvas, pos, img);
+        renderSprite(canvas, pos, cameraPos, img);
       }
     }
   }
@@ -145,8 +152,8 @@ class SpriteAnimator with SpriteArchetype {
     }
   }
 
-  void renderSprite(Canvas canvas, Point<double> pos, Map<String, dynamic> img) {
-    updateCanvas(canvas, pos.x, pos.y, scale, () {
+  void renderSprite(Canvas canvas, Point<double> pos, Rect cameraPos, Map<String, dynamic> img) {
+    updateCanvas(canvas, pos.x + cameraPos.left * -1, pos.y + cameraPos.top * -1, scale, () {
       canvas.drawImageRect(
         this.texture!,
         Rect.fromLTWH(img["x"].toDouble(), img["y"].toDouble(), img["width"].toDouble(), img["height"].toDouble()),

@@ -176,13 +176,13 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         scale: 1.0,
       ),
       SpriteAnimator(
-        position: Point<double>(100.0, 100.0),
+        position: Point<double>(300.0, 300.0),
         textureName: "bat",
         currentFrame: "fly/Fly2_Bats",
         id: "bat",
         centerOffset: Offset(0.0, 0.0),
         loop: RepeatMode.Repeat,
-        scale: 0.5,
+        scale: 0.35,
         zIndex: 2,
         startAlive: true,
         fps: 24,
@@ -343,12 +343,12 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
                                 height: viewportConstraints.maxHeight,
                                 cameraProps: CameraProps(
                                   enabled: true,
-                                  canvasSize: Size(
+                                  canvasSize: const Size(500, 500),
+                                  mapSize: Size(
                                     viewportConstraints.maxWidth,
                                     viewportConstraints.maxHeight,
                                   ),
-                                  mapSize: Size(viewportConstraints.maxWidth, viewportConstraints.maxHeight),
-                                  followObject: const Rect.fromLTWH(200.0, 180.0, 80, 80),
+                                  followObject: "bat",
                                   offset: const Point<double>(0.0, 0.0),
                                 ),
                               ),
