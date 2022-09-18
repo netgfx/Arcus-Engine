@@ -27,6 +27,7 @@ import 'package:arcus_engine/helpers/action_manager.dart';
 import 'package:arcus_engine/helpers/sprite_cache.dart';
 import 'package:arcus_engine/helpers/tween_manager.dart';
 import 'package:performance/performance.dart';
+import 'package:arcus_engine/helpers/math/SlowMoCurve.dart';
 
 class GameScene extends StatefulWidget {
   GameScene({required Key key}) : super(key: key);
@@ -262,7 +263,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         animationProperties: AnimationProperties(
           duration: 1000,
           delay: 0.05,
-          ease: Curves.easeOutBack,
+          ease: const SlowMoCurve(linearRatio: 0.25, power: 0.9),
         ),
       ),
       () => {print("tween complete!")},
