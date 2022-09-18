@@ -176,7 +176,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         scale: 1.0,
       ),
       SpriteAnimator(
-        position: Point<double>(300.0, 300.0),
+        position: Point<double>(100.0, 100.0),
         textureName: "bat",
         currentFrame: "fly/Fly2_Bats",
         id: "bat",
@@ -192,7 +192,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       TextObject(
           id: "mainText",
           text: "Hello Arcus!",
-          position: Vector2(x: 300, y: 250),
+          position: Vector2(x: 100, y: 250),
           fontSize: 56,
           color: Colors.green,
           startAlive: true,
@@ -251,22 +251,23 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       }
     }
     SoundManager.shared.playTrack("click");
-    // _tween.addTween(
-    //   TweenOptions(
-    //     target: "bat",
-    //     collection: sprites,
-    //     property: "scale",
-    //     to: 0.8,
-    //     autostart: true,
-    //     animationProperties: AnimationProperties(
-    //       duration: 2000,
-    //       delay: 0,
-    //       ease: Curves.easeOutBack,
-    //     ),
-    //   ),
-    //   () => {print("tween complete!")},
-    //   null,
-    // )
+    _tween.addTween(
+      TweenOptions(
+        target: "mainText",
+        //collection: sprites,
+        property: "scale",
+        to: 1.0,
+        from: 0.1,
+        autostart: true,
+        animationProperties: AnimationProperties(
+          duration: 1000,
+          delay: 0.05,
+          ease: Curves.easeOutBack,
+        ),
+      ),
+      () => {print("tween complete!")},
+      null,
+    );
   }
 
   void playFly() {

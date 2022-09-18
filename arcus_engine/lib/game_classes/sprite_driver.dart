@@ -171,10 +171,15 @@ class SpriteDriverCanvas extends CustomPainter {
               // check for events
               if (shouldCheckEvent == true) {
                 if (item.interactive == true) {
+                  /// get camera position
+                  Rect cameraPos = Rect.fromLTWH(0, 0, 0, 0);
+                  if (_camera != null) {
+                    cameraPos = _camera!.getCameraBounds();
+                  }
                   // need to take depth into account
                   bool result = Utils.shared.containsRaw(
-                    item.getPosition().x,
-                    item.getPosition().y,
+                    item.getPosition().x + (cameraPos.left * -1),
+                    item.getPosition().y + (cameraPos.top * -1),
                     item.size.width,
                     item.size.height,
                     eventPoint.x,

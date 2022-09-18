@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:flutter/material.dart';
 
@@ -33,6 +34,7 @@ class TextObject {
   late TextSpan textSpan;
   late TextPainter textPainter;
   double angle = 0.0;
+  double scale = 1.0;
 
   /// constructor
   TextObject({
@@ -58,6 +60,7 @@ class TextObject {
     maxHeight,
     maxLines,
     angle,
+    scale,
   }) {
     this.id = id ?? UniqueKey().toString();
     this.fontWeight = fontWeight ?? FontWeight.normal;
@@ -78,6 +81,7 @@ class TextObject {
     this.maxHeight = maxHeight ?? 100;
     this.maxLines = maxLines ?? 10;
     this.angle = angle ?? 0.0;
+    this.scale = scale ?? 1.0;
     paint = Paint();
     foregroundPaint = Paint();
 
@@ -150,6 +154,11 @@ class TextObject {
     double timestamp = 0.0,
     bool shouldUpdate = true,
   }) {
+    /// get camera position
+    Rect cameraPos = Rect.fromLTWH(0, 0, 0, 0);
+    if (GameObject.shared.world != null) {
+      cameraPos = GameObject.shared.world!.getCamera().getCameraBounds();
+    }
     // /// Physics
     // if (enablePhysics == true && physicsBody == null) {
     //   setupPhysicsBody();
@@ -170,12 +179,33 @@ class TextObject {
     /// previous update and this one
     _applyText();
     performLayout();
-    updateCanvas(canvas, 0, 0, angle, () {
+    updateCanvas(canvas, position.x + (cameraPos.left * -1), position.y + (cameraPos.top * -1), angle, scale, () {
       textPainter.paint(canvas, Offset(position.x, position.y));
-    });
+    }, translate: true);
   }
 
-  void updateCanvas(Canvas canvas, double? x, double? y, double? rotate, VoidCallback callback, {bool translate = false}) {
+  void setProperty(String type, dynamic value) {
+    switch (type) {
+      case "scale":
+        {
+          scale = value;
+          break;
+        }
+      case "x":
+        {
+          position = Vector2(x: value, y: this.position.y);
+          break;
+        }
+
+      case "y":
+        {
+          position = Vector2(x: this.position.x, y: value);
+          break;
+        }
+    }
+  }
+
+  void updateCanvas(Canvas canvas, double? x, double? y, double? rotate, double? scale, VoidCallback callback, {bool translate = false}) {
     double _x = x ?? 0;
     double _y = y ?? 0;
     canvas.save();
@@ -184,11 +214,20 @@ class TextObject {
       canvas.translate(_x, _y);
     }
 
+    if (scale != null) {
+      //if (translate) {
+      //canvas.translate(_x - size.width / 2, _y - size.height / 2);
+      //}
+      canvas.scale(scale);
+      canvas.translate(-_x, -_y);
+    }
+
     if (rotate != null) {
-      canvas.translate(_x, _y);
+      //canvas.translate(_x, _y);
       canvas.rotate(rotate);
     }
     callback();
+
     canvas.restore();
   }
 }
