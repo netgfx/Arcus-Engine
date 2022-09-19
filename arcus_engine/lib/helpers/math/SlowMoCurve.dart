@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/animation.dart';
 
 class SlowMoCurve extends Curve {

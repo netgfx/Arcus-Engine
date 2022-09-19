@@ -184,6 +184,30 @@ class TextObject {
     }, translate: true);
   }
 
+  dynamic getProperty(String type) {
+    switch (type) {
+      case "scale":
+        {
+          return scale;
+        }
+
+      case "x":
+        {
+          return position.x;
+        }
+
+      case "y":
+        {
+          return position.y;
+        }
+
+      case "rotation":
+        {
+          return angle;
+        }
+    }
+  }
+
   void setProperty(String type, dynamic value) {
     switch (type) {
       case "scale":
@@ -193,7 +217,7 @@ class TextObject {
         }
       case "x":
         {
-          position = Vector2(x: value, y: this.position.y);
+          position = Vector2(x: value, y: position.y);
           break;
         }
 

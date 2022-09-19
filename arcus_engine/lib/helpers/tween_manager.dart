@@ -40,9 +40,7 @@ class TweenManager {
   TickerProvider ticker;
   TweenManager({required this.ticker});
 
-  /**
-   * {duration, target, property, end, ease}
-   */
+  /// {duration, target, property, end, ease}
   AnimationController addTween(TweenOptions options, Function? completeFn, Function? updateFn) {
     AnimationController controller = AnimationController(vsync: this.ticker, duration: Duration(milliseconds: options.animationProperties!.duration.toInt()));
 

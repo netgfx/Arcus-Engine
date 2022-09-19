@@ -29,6 +29,9 @@
 - Tweens 🏭
   - Add enumerable properties e.g (x, y) or make it read dot notation
   - Tween working with item Id now (so all items should have an id)
+  - Extra easings
+    - Slow-mo
+    - Spring bounce
 - Sprite rotation
 - Pooling 🚩
 - Add text object support ✔️

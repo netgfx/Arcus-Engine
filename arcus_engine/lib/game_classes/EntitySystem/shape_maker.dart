@@ -32,7 +32,7 @@ class ShapeMaker {
   ShapeType type = ShapeType.Rect;
   Size size = Size(20, 20);
   double radius = 0.0;
-  double? angle = 0;
+  double? angle = 0.0;
   Color _color = Color.fromARGB(255, 0, 0, 0);
   Paint paint = Paint();
   bool _alive = false;
@@ -43,6 +43,7 @@ class ShapeMaker {
   Function? _onEvent;
   String _id = "";
   dynamic _physicsBody = null;
+  double scale = 1.0;
   bool enablePhysics = false;
   TDWorld? world = GameObject.shared.getWorld();
   PhysicsBodyProperties physicsBodyProperties = PhysicsBodyProperties();
@@ -54,6 +55,7 @@ class ShapeMaker {
     radius,
     position,
     angle,
+    scale,
     paintOptions,
     startAlive,
     id,
@@ -68,6 +70,7 @@ class ShapeMaker {
     this.radius = radius.toDouble() ?? 50.0;
     this.position = position;
     this.angle = angle ?? 0.0;
+    this.scale = scale ?? 1.0;
     this.id = id ?? UniqueKey().toString();
     this.zIndex = zIndex ?? 0;
     this.interactive = interactive ?? false;
@@ -312,6 +315,51 @@ class ShapeMaker {
   Point<double> getPosition() {
     Point<double> pos = Point(position.x - this.size.width / 2, position.y - this.size.height / 2);
     return pos;
+  }
+
+  dynamic getProperty(String type) {
+    switch (type) {
+      case "scale":
+        {
+          return scale;
+        }
+
+      case "x":
+        {
+          return position.x;
+        }
+
+      case "y":
+        {
+          return position.y;
+        }
+
+      case "rotation":
+        {
+          return angle;
+        }
+    }
+  }
+
+  void setProperty(String type, dynamic value) {
+    switch (type) {
+      case "scale":
+        {
+          scale = value;
+          break;
+        }
+      case "x":
+        {
+          position = Point(value, position.y);
+          break;
+        }
+
+      case "y":
+        {
+          position = Point(position.x, value);
+          break;
+        }
+    }
   }
 
   void updateCanvas(Canvas canvas, double? x, double? y, double? rotate, VoidCallback callback, {bool translate = false}) {

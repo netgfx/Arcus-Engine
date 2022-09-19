@@ -27,6 +27,7 @@ mixin SpriteArchetype {
   int _zIndex = 0;
   bool _enablePhysics = false;
   PhysicsBodySimple? _physicsBody = null;
+  double _angle = 0.0;
   PhysicsBodyProperties physicsBodyProperties = PhysicsBodyProperties();
 
   // SpriteArchetype({
@@ -42,6 +43,14 @@ mixin SpriteArchetype {
     double timestamp = 0.0,
     bool shouldUpdate = true,
   }) {}
+
+  double get angle {
+    return _angle;
+  }
+
+  set angle(double value) {
+    _angle = value;
+  }
 
   String get id {
     return this._id;
@@ -117,6 +126,56 @@ mixin SpriteArchetype {
 
   bool onCollide(dynamic item) {
     return true;
+  }
+
+  dynamic getProperty(String type) {
+    switch (type) {
+      case "scale":
+        {
+          return scale;
+        }
+
+      case "x":
+        {
+          return position.x;
+        }
+
+      case "y":
+        {
+          return position.y;
+        }
+
+      case "rotation":
+        {
+          return angle;
+        }
+    }
+  }
+
+  void setProperty(String type, dynamic value) {
+    switch (type) {
+      case "scale":
+        {
+          scale = value;
+          break;
+        }
+      case "x":
+        {
+          position = Point(value, this.position.y);
+          break;
+        }
+
+      case "y":
+        {
+          position = Point(this.position.x, value);
+          break;
+        }
+
+      case "rotation":
+        {
+          angle = value;
+        }
+    }
   }
 
   void updateCanvas(Canvas canvas, double? x, double? y, double? scale, VoidCallback callback, {bool translate = false}) {
