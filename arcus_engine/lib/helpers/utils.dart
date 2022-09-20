@@ -6,7 +6,6 @@ import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_native_image/flutter_native_image.dart' as uiImage;
 import 'package:arcus_engine/game_classes/EntitySystem/sprite_archetype.dart';
 import 'package:arcus_engine/helpers/Circle.dart';
 import 'package:arcus_engine/helpers/rectangle.dart';

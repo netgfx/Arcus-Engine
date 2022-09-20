@@ -4,12 +4,13 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:arcus_engine/game_classes/EntitySystem/bitmap_font.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/particle_emitter.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/text_object.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/helpers/game_object.dart';
-import 'package:arcus_engine/helpers/vector_little.dart';
+import 'package:arcus_engine/helpers/vector_little.dart' as vec2;
 import 'package:arcus_engine/helpers/sound_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -94,8 +95,17 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         dataPath: "assets/flying_monster.json",
         delimiters: ["death/Death_animations", "fly/Fly2_Bats"],
       );
+      cache.addItem(
+        "mageFont",
+        texturePath: "assets/fonts/mageGreen.png",
+        dataPath: "assets/fonts/mageGreen.fnt",
+        dataType: "xml",
+      );
 
-      cache.addItem("bg", texturePath: "assets/bg_07.jpg");
+      cache.addItem(
+        "bg",
+        texturePath: "assets/bg_07.jpg",
+      );
 
       var result = cache.loadItems();
       result.then((value) => {
@@ -193,7 +203,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       TextObject(
           id: "mainText",
           text: "Hello Arcus!",
-          position: Vector2(x: 100, y: 250),
+          position: vec2.Vector2(x: 100, y: 250),
           fontSize: 56,
           color: Colors.green,
           startAlive: true,
@@ -234,7 +244,13 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       //   enablePhysics: true,
       //   physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 1000, immovable: true),
       // ),
-      group
+      group,
+      BitmapFont(
+        targetText: "Hello!",
+        position: vec2.Vector2(x: 200, y: 100),
+        textureName: "mageFont",
+        startAlive: true,
+      ),
     ];
 
     setState(() {

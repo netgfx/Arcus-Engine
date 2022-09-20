@@ -8,8 +8,8 @@ import 'package:arcus_engine/helpers/utils.dart';
 
 class SpriteCache {
   String textureLoadState = "none";
-  Map<String, dynamic> _cache = {};
-  FutureGroup _group = FutureGroup();
+  final Map<String, dynamic> _cache = {};
+  final FutureGroup _group = FutureGroup();
   // constructor
   SpriteCache() {}
 
@@ -18,14 +18,16 @@ class SpriteCache {
    */
   void addItem(
     String key, {
-    String? texturePath = null,
-    String? dataPath = null,
-    List<String>? delimiters = null,
+    String? texturePath,
+    String dataPath = "",
+    List<String>? delimiters,
+    String dataType = "",
   }) {
     _cache[key] = {
       "loadedState": "none",
       "texturePath": texturePath,
       "dataPath": dataPath,
+      "dataType": dataType,
       "texture": null,
       "spriteData": null,
       "delimiters": delimiters,
@@ -40,11 +42,15 @@ class SpriteCache {
   Future<bool> loadItems() async {
     _cache.forEach((key, item) {
       if (item["loadedState"] == "none") {
-        if (item["dataPath"] == null) {
+        if (item["dataPath"] == null || item["dataPath"] == "") {
           // load static img
           _group.add(loadImage(key));
         } else {
-          _group.add(loadSprite(key));
+          if (item["dataType"] == "" || item["dataType"].toLowerCase() == "json") {
+            _group.add(loadSprite(key));
+          } else if (item["dataType"].toLowerCase() == "xml") {
+            _group.add(loadBitmapFont(key));
+          }
         }
       }
     });
@@ -62,8 +68,10 @@ class SpriteCache {
     _cache[key]["loadedState"] = "loading";
     String texturePath = _cache[key]["texturePath"];
     String dataPath = _cache[key]["dataPath"];
+    String? dataType = _cache[key]["dataType"];
     final ByteData data = await rootBundle.load(texturePath);
     _cache[key]["texture"] = await Utils.shared.imageFromBytes(data);
+
     if (dataPath != "") {
       var data = await loadJsonData(dataPath);
       _cache[key]["spriteData"] = parseJSON(key, data);
@@ -80,6 +88,8 @@ class SpriteCache {
     String dataPath = _cache[key]["dataPath"];
     final ByteData data = await rootBundle.load(texturePath);
     _cache[key]["texture"] = await Utils.shared.imageFromBytes(data);
+    _cache[key]["textureWidth"] = _cache[key]["texture"]!.width;
+    _cache[key]["textureHeight"] = _cache[key]["texture"]!.height;
     if (dataPath != "") {
       var data = await loadXMLData(dataPath);
       _cache[key]["fntData"] = data;
@@ -99,9 +109,9 @@ class SpriteCache {
     return data;
   }
 
-  XmlDocument loadXMLData(String path) {
-    var xmlText = File(path);
-    final data = XmlDocument.parse(xmlText.readAsStringSync());
+  Future<XmlDocument> loadXMLData(String path) async {
+    var xmlText = await rootBundle.loadString(path);
+    final data = XmlDocument.parse(xmlText);
 
     return data;
   }
