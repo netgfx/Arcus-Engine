@@ -40,6 +40,10 @@
   - Physics !?
   - Bordered with fill (need to do some hacking in there) 🏭
   - Dynamic ✔️
+- Bitmap font support 🏭
+  - Cache items ✔️
+  - Read .fnt file and texture ✔️
+  - Reconstruct text with bitmap images
 - port Arcade physics ❗
   - Simple physics 🏭
   - generalize the collision 🏭
@@ -72,6 +76,9 @@
   - Arcus ✔️
 - Documentation ❗
 
+<br/>
+<hr/>
+<br/>
 ### Sample games for v0.1
 
 - whack a mole
