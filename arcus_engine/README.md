@@ -30,8 +30,8 @@
   - Add enumerable properties e.g (x, y) or make it read dot notation
   - Tween working with item Id now (so all items should have an id)
   - Extra easings
-    - Slow-mo
-    - Spring bounce
+    - Slow-mo ✔️
+    - Spring bounce ✔️
 - Sprite rotation
 - Pooling 🚩
 - Add text object support ✔️
@@ -64,7 +64,7 @@
 - Particles 🏭
 - Camera 🏭
   - need to test with scrolling sprite (WIP)
-  - need to test moving sprite
+  - need to test moving sprite 🧪
   - Add a cursor class to track user movement and feed that to Camera
     - size
     - position

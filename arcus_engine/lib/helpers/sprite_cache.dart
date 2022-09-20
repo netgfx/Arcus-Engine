@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:xml/xml.dart';
 import 'package:async/async.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
@@ -72,6 +74,22 @@ class SpriteCache {
     }
   }
 
+  Future<void> loadBitmapFont(String key) async {
+    _cache[key]["loadedState"] = "loading";
+    String texturePath = _cache[key]["texturePath"];
+    String dataPath = _cache[key]["dataPath"];
+    final ByteData data = await rootBundle.load(texturePath);
+    _cache[key]["texture"] = await Utils.shared.imageFromBytes(data);
+    if (dataPath != "") {
+      var data = await loadXMLData(dataPath);
+      _cache[key]["fntData"] = data;
+
+      _cache[key]["loadedState"] = "done";
+    } else {
+      _cache[key]["loadedState"] = "none";
+    }
+  }
+
   /**
    * Load the json metadata of the sprite atlas
    */
@@ -81,11 +99,17 @@ class SpriteCache {
     return data;
   }
 
+  XmlDocument loadXMLData(String path) {
+    var xmlText = File(path);
+    final data = XmlDocument.parse(xmlText.readAsStringSync());
+
+    return data;
+  }
+
   /**
    * Parse the json metadata into proper dictionary structure
    */
-  Map<String, List<Map<String, dynamic>>> parseJSON(
-      String key, Map<String, dynamic> data) {
+  Map<String, List<Map<String, dynamic>>> parseJSON(String key, Map<String, dynamic> data) {
     Map<String, List<Map<String, dynamic>>> sprites = {};
     List<String> delimiters = _cache[key]["delimiters"];
     for (var key in delimiters) {
