@@ -17,9 +17,11 @@ class BitmapFontCharacter {
   final int xadvance;
   final int page;
   final int channel;
+  final int x;
+  final int y;
   //final ui.Image image;
 
-  BitmapFontCharacter(this.id, this.width, this.height, this.xoffset, this.yoffset, this.xadvance, this.page, this.channel) {}
+  BitmapFontCharacter(this.id, this.width, this.height, this.xoffset, this.yoffset, this.xadvance, this.page, this.x, this.y, this.channel) {}
 
   @override
   String toString() {
@@ -37,6 +39,7 @@ class BitmapFont {
   bool italic = false;
   String charset = '';
   String unicode = '';
+  int fontSize = 40;
   int stretchH = 0;
   bool smooth = false;
   bool antialias = false;
@@ -60,6 +63,8 @@ class BitmapFont {
   int zIndex = 0;
   bool _alive = false;
   bool startAlive = false;
+  int letterSpacing = 5;
+  Paint _paint = new Paint();
 
   Map<int, BitmapFontCharacter> characters = {};
   Map<int, Map<int, int>> kernings = {};
@@ -73,10 +78,11 @@ class BitmapFont {
     if (startAlive == true) {
       alive = true;
     }
+
     setCache();
     if (xmlData != null) {
       _parseFnt(xmlData!, {0: texture});
-      print(characters);
+      //print(characters);
     }
   }
 
@@ -97,8 +103,78 @@ class BitmapFont {
     if (xmlData == null) {
       setCache();
       if (xmlData != null) {
-        _parseFnt(xmlData!, {0: texture});
-        print(characters);
+        if (characters.isEmpty) {
+          _parseFnt(xmlData!, {0: texture});
+        }
+        //print(characters);
+      }
+    }
+
+    if (characters.isNotEmpty) {
+      scale = fontSize / size;
+      List<BitmapFontCharacter> bitmapText = constructText();
+      //print(bitmapText);
+      var chars = [];
+      double x = 0.0;
+      var prevCharCode = null;
+      double w = 0.0;
+      for (BitmapFontCharacter item in bitmapText) {
+        var kerning = 0;
+
+        if (prevCharCode != null) {
+          if (kernings[item.id] != null) {
+            var prevKerning = kernings[item.id]![prevCharCode!];
+            if (prevKerning != null) {
+              kerning = prevKerning;
+            } else {
+              kerning = 0;
+            }
+          } else {
+            kerning = 0;
+          }
+        }
+
+        w += (item.xadvance + kerning + letterSpacing) * scale;
+
+        chars.add(x + (item.xoffset + kerning + letterSpacing) * scale);
+
+        x += (item.xadvance + kerning + letterSpacing) * scale;
+
+        prevCharCode = item.id;
+      }
+
+      Map<String, dynamic> result = {
+        "width": w,
+        "end": 0,
+        "chars": chars,
+      };
+
+      //print(result);
+
+      // print them
+      /// get camera position
+      Rect cameraPos = Rect.fromLTWH(0, 0, 0, 0);
+      if (GameObject.shared.world != null) {
+        cameraPos = GameObject.shared.world!.getCamera().getCameraBounds();
+      }
+
+      int counter = 0;
+      for (var item in bitmapText) {
+        updateCanvas(canvas, position.x + result['chars'][counter] + cameraPos.left * -1, position.y + cameraPos.top * -1, scale, () {
+          canvas.drawImageRect(
+            this.texture!,
+            Rect.fromLTWH(item.x.toDouble(), item.y.toDouble(), item.width.toDouble(), item.height.toDouble()),
+            Rect.fromLTWH(
+              0,
+              0,
+              item.width.toDouble(),
+              item.height.toDouble(),
+            ),
+            _paint,
+          );
+        }, translate: false);
+
+        counter += 1;
       }
     }
   }
@@ -129,6 +205,16 @@ class BitmapFont {
   List<BitmapFontCharacter> constructText() {
     List<BitmapFontCharacter> list = [];
     // use codeUnitAt
+    List<String> stringList = targetText.split("");
+    for (var character in stringList) {
+      int char = character.codeUnitAt(0);
+      BitmapFontCharacter? finalChar = characters[char];
+      if (finalChar != null) {
+        list.add(finalChar);
+      }
+    }
+
+    //print(list.length);
     return list;
   }
 
@@ -273,7 +359,7 @@ class BitmapFont {
 
           final fontImage = fontPages[page];
 
-          final ch = BitmapFontCharacter(id, width, height, xoffset, yoffset, xadvance, page, chnl);
+          final ch = BitmapFontCharacter(id, width, height, xoffset, yoffset, xadvance, page, x, y, chnl);
 
           characters[id] = ch;
 
@@ -289,5 +375,22 @@ class BitmapFont {
         }
       }
     }
+  }
+
+  void updateCanvas(Canvas canvas, double? x, double? y, double? scale, ui.VoidCallback callback, {bool translate = false}) {
+    double _x = x ?? 0;
+    double _y = y ?? 0;
+    canvas.save();
+
+    if (translate) {
+      canvas.translate(_x, _y);
+    }
+
+    if (scale != null) {
+      canvas.translate(_x, _y);
+      canvas.scale(scale);
+    }
+    callback();
+    canvas.restore();
   }
 }
