@@ -246,8 +246,8 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       // ),
       group,
       BitmapFont(
-        targetText: "Hello!",
-        position: vec2.Vector2(x: 200, y: 100),
+        targetText: "Hello world!\nAnd then some!",
+        position: vec2.Vector2(x: 100, y: 100),
         textureName: "mageFont",
         startAlive: true,
       ),

@@ -47,6 +47,7 @@ class BitmapFont {
   List<int> spacing = [];
   bool outline = false;
   int lineHeight = 0;
+  int lineHeightOffset = 40;
   int base = 0;
   num scaleW = 0;
   num scaleH = 0;
@@ -64,6 +65,7 @@ class BitmapFont {
   bool _alive = false;
   bool startAlive = false;
   int letterSpacing = 5;
+  int maxWidth = 500;
   Paint _paint = new Paint();
 
   Map<int, BitmapFontCharacter> characters = {};
@@ -73,11 +75,14 @@ class BitmapFont {
     required this.targetText,
     required this.position,
     required this.textureName,
+    maxWidth,
     startAlive,
   }) {
     if (startAlive == true) {
       alive = true;
     }
+
+    maxWidth = maxWidth ?? 500;
 
     setCache();
     if (xmlData != null) {
@@ -111,45 +116,36 @@ class BitmapFont {
     }
 
     if (characters.isNotEmpty) {
-      scale = fontSize / size;
-      List<BitmapFontCharacter> bitmapText = constructText();
-      //print(bitmapText);
-      var chars = [];
-      double x = 0.0;
-      var prevCharCode = null;
-      double w = 0.0;
-      for (BitmapFontCharacter item in bitmapText) {
-        var kerning = 0;
+      List<List<BitmapFontCharacter>> mainList = [];
 
-        if (prevCharCode != null) {
-          if (kernings[item.id] != null) {
-            var prevKerning = kernings[item.id]![prevCharCode!];
-            if (prevKerning != null) {
-              kerning = prevKerning;
-            } else {
-              kerning = 0;
-            }
-          } else {
-            kerning = 0;
-          }
-        }
+      var _lines = targetText.split(RegExp(r'\r\n|\r|\n+'));
+      // for (var line in _lines) {
+      //   List<BitmapFontCharacter> bitmapText = constructText(line);
+      //   mainList.add(bitmapText);
+      // }
 
-        w += (item.xadvance + kerning + letterSpacing) * scale;
-
-        chars.add(x + (item.xoffset + kerning + letterSpacing) * scale);
-
-        x += (item.xadvance + kerning + letterSpacing) * scale;
-
-        prevCharCode = item.id;
-      }
-
-      Map<String, dynamic> result = {
-        "width": w,
-        "end": 0,
-        "chars": chars,
+      List<Map<String, dynamic>> lines = [];
+      double textWidth = 0;
+      double y = 0;
+      var text = targetText;
+      Map<String, dynamic> line = {
+        'text': "",
+        "end": true,
+        "chars": [],
+        "width": 0,
       };
 
-      //print(result);
+      for (var text in _lines) {
+        Map<String, dynamic> line = scanLine(text);
+
+        line["y"] = y;
+
+        lines.add(line);
+
+        if (line["width"] > textWidth) {
+          textWidth = line["width"];
+        }
+      }
 
       // print them
       /// get camera position
@@ -158,25 +154,121 @@ class BitmapFont {
         cameraPos = GameObject.shared.world!.getCamera().getCameraBounds();
       }
 
-      int counter = 0;
-      for (var item in bitmapText) {
-        updateCanvas(canvas, position.x + result['chars'][counter] + cameraPos.left * -1, position.y + cameraPos.top * -1, scale, () {
-          canvas.drawImageRect(
-            this.texture!,
-            Rect.fromLTWH(item.x.toDouble(), item.y.toDouble(), item.width.toDouble(), item.height.toDouble()),
-            Rect.fromLTWH(
-              0,
-              0,
-              item.width.toDouble(),
-              item.height.toDouble(),
-            ),
-            _paint,
-          );
-        }, translate: false);
+      for (var i = 0; i < lines.length; i++) {
+        for (var j = 0; j < lines[i]["charData"].length; j++) {
+          BitmapFontCharacter item = lines[i]["charData"][j];
+          // calculate y in case of multi-line
+          y = lineHeight * scale * i + lineHeightOffset * i + item.yoffset;
 
-        counter += 1;
+          updateCanvas(canvas, position.x + lines[i]['chars'][j] + cameraPos.left * -1, position.y + cameraPos.top * -1, scale, () {
+            canvas.drawImageRect(
+              this.texture!,
+              Rect.fromLTWH(item.x.toDouble(), item.y.toDouble(), item.width.toDouble(), item.height.toDouble()),
+              Rect.fromLTWH(
+                0,
+                y,
+                item.width.toDouble(),
+                item.height.toDouble(),
+              ),
+              _paint,
+            );
+          }, translate: false);
+        }
       }
     }
+  }
+
+  Map<String, dynamic> scanLine(String text) {
+    scale = fontSize / size;
+
+    //print(bitmapText);
+    var chars = [];
+    double x = 0.0;
+    var prevCharCode = null;
+    double w = 0.0;
+    var lastSpace = -1;
+    double wrappedWidth = 0;
+
+    var end = false;
+    List<BitmapFontCharacter> charDataList = [];
+    for (var i = 0; i < text.length; i++) {
+      //BitmapFontCharacter item = bitmapText[i];
+      var kerning = 0;
+      //print("$i, ${text.length}");
+      end = (i == text.length - 1) ? true : false;
+
+      if (RegExp(r'\r\n|\r|\n+').hasMatch(text[i])) {
+        return {
+          "width": w,
+          "text": text.substring(0, i),
+          "end": end,
+          "chars": chars,
+        };
+      }
+
+      double c = 0;
+      var charCode = text.codeUnitAt(i);
+      BitmapFontCharacter? charData = characters[charCode];
+
+      if (charData == null) {
+        charCode = 32;
+        charData = characters[charCode];
+      }
+
+      charDataList.add(charData!);
+
+      if (prevCharCode != null) {
+        if (kernings[charData!.id] != null) {
+          var prevKerning = kernings[charData.id]![prevCharCode!.id];
+          if (prevKerning != null) {
+            kerning = prevKerning;
+          } else {
+            kerning = 0;
+          }
+        } else {
+          kerning = 0;
+        }
+      }
+
+      var regEx = RegExp(r'(\s+)');
+
+      if (regEx.hasMatch(targetText[i])) {
+        lastSpace = i;
+        wrappedWidth = w;
+      }
+
+      //  What will the line width be if we add this character to it?
+      c = (kerning + charData!.width + charData.xoffset) * scale;
+
+      if (((w + c) >= maxWidth) && lastSpace > -1) {
+        //  The last space was at "lastSpace" which was "i - lastSpace" characters ago
+        return {
+          "width": wrappedWidth,
+          "end": false,
+          "text": text.substring(0, i - (i - lastSpace)),
+          "chars": chars,
+          "charData": charDataList,
+        };
+      } else {
+        w += (charData.xadvance + kerning + letterSpacing) * scale;
+
+        chars.add(x + (charData.xoffset + kerning + letterSpacing) * scale);
+
+        x += (charData.xadvance + kerning + letterSpacing) * scale;
+
+        prevCharCode = charData;
+      }
+    }
+
+    Map<String, dynamic> result = {
+      "width": w,
+      "end": end,
+      "text": text,
+      "chars": chars,
+      "charData": charDataList,
+    };
+
+    return result;
   }
 
   Iterable<XmlElement> _childElements(XmlNode n) => n.children.whereType<XmlElement>();
@@ -202,10 +294,10 @@ class BitmapFont {
     itemSize = Size(width.toDouble(), height.toDouble());
   }
 
-  List<BitmapFontCharacter> constructText() {
+  List<BitmapFontCharacter> constructText(String text) {
     List<BitmapFontCharacter> list = [];
     // use codeUnitAt
-    List<String> stringList = targetText.split("");
+    List<String> stringList = text.split("");
     for (var character in stringList) {
       int char = character.codeUnitAt(0);
       BitmapFontCharacter? finalChar = characters[char];
