@@ -43,7 +43,8 @@
 - Bitmap font support 🏭
   - Cache items ✔️
   - Read .fnt file and texture ✔️
-  - Reconstruct text with bitmap images
+  - Reconstruct text with bitmap images ✔️
+  - Multi-line (only works with line breaks \n,\r) ✔️
 - port Arcade physics ❗
   - Simple physics 🏭
   - generalize the collision 🏭
