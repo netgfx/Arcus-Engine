@@ -59,14 +59,16 @@ class BitmapFont {
   int textureWidth = 0;
   int textureHeight = 0;
   double scale = 1.0;
-  Size itemSize = Size(0, 0);
+  Size itemSize = const Size(0, 0);
   String id = UniqueKey().toString();
   int zIndex = 0;
   bool _alive = false;
   bool startAlive = false;
   int letterSpacing = 5;
   int maxWidth = 500;
-  Paint _paint = new Paint();
+  bool _interactive = false;
+  Function? _onEvent;
+  final Paint _paint = Paint();
 
   Map<int, BitmapFontCharacter> characters = {};
   Map<int, Map<int, int>> kernings = {};
@@ -75,12 +77,23 @@ class BitmapFont {
     required this.targetText,
     required this.position,
     required this.textureName,
+    letterSpacing,
     maxWidth,
     startAlive,
+    scale,
+    interactive,
+    onEvent,
+    zIndex,
   }) {
     if (startAlive == true) {
       alive = true;
     }
+
+    this.letterSpacing = letterSpacing ?? 5;
+    this.scale = scale ?? 1.0;
+    this.zIndex = zIndex ?? 0;
+    this.interactive = interactive ?? false;
+    this.onEvent = onEvent;
 
     maxWidth = maxWidth ?? 500;
 
@@ -89,6 +102,22 @@ class BitmapFont {
       _parseFnt(xmlData!, {0: texture});
       //print(characters);
     }
+  }
+
+  bool get interactive {
+    return _interactive;
+  }
+
+  void set interactive(bool value) {
+    this._interactive = value;
+  }
+
+  void set onEvent(Function? value) {
+    this._onEvent = value;
+  }
+
+  Function? get onEvent {
+    return this._onEvent;
   }
 
   bool get alive {

@@ -153,7 +153,7 @@ class SpriteAnimator with SpriteArchetype {
   }
 
   void renderSprite(Canvas canvas, Point<double> pos, Rect cameraPos, Map<String, dynamic> img) {
-    updateCanvas(canvas, pos.x + cameraPos.left * -1, pos.y + cameraPos.top * -1, scale, () {
+    updateCanvas(canvas, pos.x + cameraPos.left * -1, pos.y + cameraPos.top * -1, scale, angle, () {
       canvas.drawImageRect(
         this.texture!,
         Rect.fromLTWH(img["x"].toDouble(), img["y"].toDouble(), img["width"].toDouble(), img["height"].toDouble()),

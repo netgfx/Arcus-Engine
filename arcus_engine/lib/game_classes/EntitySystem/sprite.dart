@@ -48,10 +48,10 @@ class Sprite with SpriteArchetype {
     physicsProperties,
     onCollide,
   }) {
-    this.position = position ?? Point(0.0, 0.0);
-    _centerOffset = centerOffset ?? Offset(0, 0);
+    this.position = position ?? const Point(0.0, 0.0);
+    _centerOffset = centerOffset ?? const Offset(0, 0);
     this.interactive = interactive ?? false;
-    this.onEvent = onEvent ?? null;
+    this.onEvent = onEvent;
     this.scale = scale ?? 1.0;
     this.id = id ?? UniqueKey().toString();
     this.zIndex = zIndex ?? 0;
@@ -147,7 +147,7 @@ class Sprite with SpriteArchetype {
     if (_fitParent == true) {
       Size fitSize = Size(size.width, size.height);
 
-      updateCanvas(canvas, position.x + (cameraPos.left * -1), position.y + (cameraPos.top * -1), scale, () {
+      updateCanvas(canvas, position.x + (cameraPos.left * -1), position.y + (cameraPos.top * -1), scale, angle, () {
         if (GameObject.shared.world != null) {
           Size bounds = GameObject.shared.getWorld()!.worldBounds;
           final FittedSizes sizes = applyBoxFit(BoxFit.cover, size, bounds);
@@ -166,7 +166,7 @@ class Sprite with SpriteArchetype {
   }
 
   void renderSprite(Canvas canvas, Point<double> pos, Rect cameraPos, Paint paint) {
-    updateCanvas(canvas, pos.x + cameraPos.left * -1, pos.y + cameraPos.top * -1, scale, () {
+    updateCanvas(canvas, pos.x + cameraPos.left * -1, pos.y + cameraPos.top * -1, scale, angle, () {
       canvas.drawImageRect(
         texture!,
         Rect.fromLTWH(0, 0, textureWidth.toDouble(), textureHeight.toDouble()),

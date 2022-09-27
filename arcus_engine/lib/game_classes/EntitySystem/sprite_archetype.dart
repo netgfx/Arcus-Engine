@@ -20,13 +20,13 @@ mixin SpriteArchetype {
   bool _alive = false;
   String _id = "";
   String textureName = "";
-  Point<double> _position = Point(0, 0);
-  Size _size = Size(0, 0);
+  Point<double> _position = const Point(0, 0);
+  Size _size = const Size(0, 0);
   bool _interactive = false;
   Function? _onEvent;
   int _zIndex = 0;
   bool _enablePhysics = false;
-  PhysicsBodySimple? _physicsBody = null;
+  PhysicsBodySimple? _physicsBody;
   double _angle = 0.0;
   PhysicsBodyProperties physicsBodyProperties = PhysicsBodyProperties();
 
@@ -178,7 +178,7 @@ mixin SpriteArchetype {
     }
   }
 
-  void updateCanvas(Canvas canvas, double? x, double? y, double? scale, VoidCallback callback, {bool translate = false}) {
+  void updateCanvas(Canvas canvas, double? x, double? y, double? scale, double? rotation, VoidCallback callback, {bool translate = false}) {
     double _x = x ?? 0;
     double _y = y ?? 0;
     canvas.save();
@@ -191,6 +191,12 @@ mixin SpriteArchetype {
       canvas.translate(_x, _y);
       canvas.scale(scale);
     }
+
+    if (rotation != null) {
+      canvas.translate(_x, _y);
+      canvas.rotate(rotation);
+    }
+
     callback();
     canvas.restore();
   }

@@ -32,7 +32,9 @@
   - Extra easings
     - Slow-mo ✔️
     - Spring bounce ✔️
-- Sprite rotation
+- Sprite rotation 🏭
+  - Angle property exists ✔️
+  - Add angular velocity support
 - Pooling 🚩
 - Add text object support ✔️
   - Styles (fonts, color simple, size, etc) ✔️
@@ -40,6 +42,7 @@
   - Physics !?
   - Bordered with fill (need to do some hacking in there) 🏭
   - Dynamic ✔️
+- Gamepad support
 - Bitmap font support 🏭
   - Cache items ✔️
   - Read .fnt file and texture ✔️
