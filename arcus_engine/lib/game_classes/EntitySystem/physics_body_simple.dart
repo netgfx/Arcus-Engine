@@ -285,6 +285,9 @@ class PhysicsBodySimple {
   }
 
   update(Canvas canvas, {double elapsedTime = 0.0, double timestamp = 0.0, bool shouldUpdate = true}) {
+    if (shouldUpdate == false) {
+      return;
+    }
     // var parent = this.object;
     // if (parent) {
     //   // copy parent pos/angle

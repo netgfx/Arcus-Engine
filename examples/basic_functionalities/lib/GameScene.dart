@@ -12,6 +12,7 @@ import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/vector_little.dart' as vec2;
 import 'package:arcus_engine/helpers/sound_manager.dart';
+import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -214,21 +215,21 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
           borderColor: Colors.orange,
           maxWidth: 400,
           fontFamily: "IrishGrover"),
-      // ParticleEmitter(
-      //     pos: Vector2(x: 200.0, y: 300.0),
-      //     emitSize: Vector2(x: 36, y: 36),
-      //     emitTime: 0.1,
-      //     emitRate: 200,
-      //     emitConeAngle: pi,
-      //     startColor: const Color.fromRGBO(255, 0, 128, 1),
-      //     endColor: const Color.fromRGBO(255, 0, 0, 1),
-      //     particleTime: 0.2,
-      //     fadeRate: 0.1,
-      //     randomness: 1,
-      //     collideTiles: true,
-      //     randomColorLinear: 0,
-      //     renderOrder: 1,
-      //     startAlive: true),
+      ParticleEmitter(
+          pos: Vector2(x: 250.0, y: 300.0),
+          emitSize: Vector2(x: 100, y: 100),
+          emitTime: 0.5, // in s
+          emitRate: 100,
+          emitConeAngle: pi,
+          startColor: const Color.fromRGBO(255, 0, 128, 1),
+          endColor: const Color.fromRGBO(255, 0, 0, 1),
+          particleTime: 3,
+          fadeRate: 0.55,
+          randomness: 1,
+          collideTiles: true,
+          randomColorLinear: true,
+          renderOrder: 1,
+          startAlive: true),
       // ShapeMaker(
       //   type: ShapeType.Rect,
       //   position: const Point<double>(200.0, 250.0),
@@ -245,12 +246,12 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       //   physicsProperties: PhysicsBodyProperties(velocity: Vector2(x: 0, y: 0), restitution: 0.9, friction: 0.95, mass: 1000, immovable: true),
       // ),
       group,
-      BitmapFont(
-        targetText: "Hello world!\nAnd then some!",
-        position: vec2.Vector2(x: 100, y: 100),
-        textureName: "mageFont",
-        startAlive: true,
-      ),
+      // BitmapFont(
+      //   targetText: "Hello world!\nAnd then some!",
+      //   position: vec2.Vector2(x: 100, y: 100),
+      //   textureName: "mageFont",
+      //   startAlive: true,
+      // ),
     ];
 
     setState(() {
@@ -361,7 +362,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
                                 height: viewportConstraints.maxHeight,
                                 cameraProps: CameraProps(
                                   enabled: true,
-                                  canvasSize: const Size(500, 500),
+                                  canvasSize: Size(viewportConstraints.maxWidth, viewportConstraints.maxHeight),
                                   mapSize: Size(
                                     viewportConstraints.maxWidth,
                                     viewportConstraints.maxHeight,

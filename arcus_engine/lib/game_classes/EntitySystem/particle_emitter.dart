@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:arcus_engine/game_classes/EntitySystem/particle.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/shape_maker.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/utils.dart';
@@ -40,10 +42,14 @@ class ParticleEmitter {
   bool alive = false;
   bool destroyed = false;
   int zIndex = 99;
+  ShapeType shape = ShapeType.Circle;
+  TDWorld? world;
+  PhysicsBodySimple? physicsBody;
 
   ParticleEmitter({
     required this.pos,
     angle,
+    shape,
     emitSize,
     emitTime,
     emitRate,
@@ -67,29 +73,32 @@ class ParticleEmitter {
     renderOrder,
     startAlive,
   }) {
-    angle = angle ?? 0;
-    emitSize = emitSize ?? Vector2(x: 0, y: 0);
-    emitTime = emitTime ?? 0;
-    emitRate = emitRate ?? 100;
-    emitConeAngle = emitConeAngle ?? pi;
-    startColor = startColor ?? Color(0x000);
-    endColor = endColor ?? Color(0xfff);
-    particleTime = particleTime ?? 0.5;
-    sizeStart = sizeStart ?? 0.1;
-    sizeEnd = sizeEnd ?? 1.0;
-    speed = speed ?? 0.1;
-    angleSpeed = angleSpeed ?? 0.5;
-    damping = damping ?? 1;
-    angleDamping = angleDamping ?? 1;
-    gravityScale = gravityScale ?? 0;
-    particleConeAngle = particleConeAngle ?? pi;
-    fadeRate = fadeRate ?? 0.1;
-    randomness = randomness ?? 0.2;
-    collideTiles = collideTiles ?? false;
-    additive = additive ?? false;
-    randomColorLinear = randomColorLinear ?? true;
-    renderOrder = renderOrder ?? 0;
-    alive = startAlive ?? false;
+    this.angle = angle ?? 0;
+    this.shape = shape ?? ShapeType.Circle;
+    this.emitSize = emitSize ?? Vector2(x: 0, y: 0);
+    this.emitTime = emitTime ?? 0;
+    this.emitRate = emitRate ?? 100;
+    this.emitConeAngle = emitConeAngle ?? pi;
+    this.startColor = startColor ?? Color(0x000);
+    this.endColor = endColor ?? Color(0xfff);
+    this.particleTime = particleTime ?? 0.5;
+    this.sizeStart = sizeStart ?? 1.0;
+    this.sizeEnd = sizeEnd ?? 1.0;
+    this.speed = speed ?? 0.1;
+    this.angleSpeed = angleSpeed ?? 0.5;
+    this.damping = damping ?? 1;
+    this.angleDamping = angleDamping ?? 1;
+    this.gravityScale = gravityScale ?? 0;
+    this.particleConeAngle = particleConeAngle ?? pi;
+    this.fadeRate = fadeRate ?? 0.1;
+    this.randomness = randomness ?? 0.2;
+    this.collideTiles = collideTiles ?? false;
+    this.additive = additive ?? false;
+    this.randomColorLinear = randomColorLinear ?? true;
+    this.renderOrder = renderOrder ?? 0;
+    this.alive = startAlive ?? false;
+
+    world = GameObject.shared.getWorld();
 
     ///
     spawnTime = GameObject.shared.time;
@@ -98,12 +107,16 @@ class ParticleEmitter {
   }
 
   update(Canvas canvas, {double elapsedTime = 0, double timestamp = 0.0, bool shouldUpdate = true}) {
-    if (emitTime == 0 || getAliveTime() <= emitTime) {
+    if (getAliveTime() <= emitTime) {
       // emit particles
+      world = GameObject.shared.getWorld();
       if (emitRate * particleEmitRateScale != 0) {
         var rate = 1 / emitRate / particleEmitRateScale;
         for (emitTimeBuffer += GameObject.shared.timeDelta; emitTimeBuffer > 0; emitTimeBuffer -= rate) {
-          emitParticle();
+          var particle = emitParticle();
+          if (world != null) {
+            world!.add(particle, null);
+          }
         }
       }
     } else {
@@ -112,7 +125,8 @@ class ParticleEmitter {
   }
 
   getAliveTime() {
-    return GameObject.shared.time - spawnTime;
+    var _timeElapsed = GameObject.shared.time - spawnTime;
+    return _timeElapsed;
   }
 
   destroy() {
@@ -122,7 +136,7 @@ class ParticleEmitter {
   }
 
   emitParticle() {
-    print("emitting particle");
+    //print("emitting particle");
     var pos = (Vector2(x: Utils.shared.rand(a: -.5, b: .5), y: Utils.shared.rand(a: -.5, b: .5))).multiply(emitSize).rotate(angle); // box emitter
     //Utils.shared.randInCircle(radius: emitSize.x * .5);
 
@@ -146,6 +160,8 @@ class ParticleEmitter {
 
     var particle = Particle(
         pos: this.pos.add(pos),
+        shape: shape,
+        spawnTime: GameObject.shared.time.toDouble(),
         angle: angle + Utils.shared.rand(a: particleConeAngle, b: -particleConeAngle),
         physicsProperties: PhysicsBodyProperties(
           velocity: (Vector2(x: 0, y: 0)).setAngle(angle + coneAngle, a: speed),
@@ -165,13 +181,13 @@ class ParticleEmitter {
         sizeEnd: sizeEnd - sizeStart,
         fadeRate: fadeRate,
         colorStart: colorStart,
-        colorEnd: colorEnd.subtract(colorStart),
+        colorEnd: Utils.shared.subtractColor(colorEnd, colorStart),
         destroyCallback: onParticleDestroy);
 
     return particle;
   }
 
   onParticleDestroy(id) {
-    print("particle destroyed $id");
+    //print("particle destroyed $id");
   }
 }

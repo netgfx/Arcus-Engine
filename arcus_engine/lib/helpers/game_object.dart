@@ -14,6 +14,7 @@ class GameObject {
   TDWorld? world = null;
   double time = 0;
   int frameRate = 60;
+  double frameTime = 0;
   double timeDelta = 1 / 60;
   List<CubicBezier> cubicBeziers = [];
   Map<String, ui.Image> imageCache = {};

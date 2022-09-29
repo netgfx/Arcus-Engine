@@ -874,8 +874,30 @@ class Utils {
 
   randColor(linear, {cA = const Color.fromRGBO(0, 0, 0, 1), cB = const Color.fromRGBO(0, 0, 0, 1)}) {
     return linear
-        ? cA.lerp(cB, Utils.shared.rand())
+        ? lerpColor(cA, cB, Utils.shared.rand())
         : Color.fromRGBO(rand(a: cA.red, b: cB.red), rand(a: cA.green, b: cB.green), rand(a: cA.blue, b: cB.blue), rand(a: cA.alpha, b: cB.alpha));
+  }
+
+  lerpColor(Color colorA, Color colorB, double percentage) {
+    var _subtract = Color.fromRGBO(colorB.red - colorA.red, colorB.green - colorA.green, colorB.blue - colorA.blue, colorB.opacity - colorA.opacity);
+
+    var _clamp = Color.fromRGBO(clamp(colorA.red.toDouble(), 0, 255).round(), clamp(colorA.green.toDouble(), 0, 255).round(),
+        clamp(colorA.blue.toDouble(), 0, 255).round(), clamp(colorA.opacity.toDouble(), 0, 1));
+
+    var percClamp = clamp(percentage, 0, 1);
+
+    var scale = Color.fromRGBO(
+        (_subtract.red * percClamp).toInt(), (_subtract.green * percClamp).toInt(), (_subtract.blue * percClamp).toInt(), (_subtract.opacity * percClamp));
+
+    var addition = Color.fromRGBO(colorA.red + scale.red, colorA.green + scale.green, colorA.blue + scale.blue, colorA.opacity + scale.opacity);
+
+    return addition;
+  }
+
+  subtractColor(Color colorA, Color colorB) {
+    var _subtract = Color.fromRGBO(colorA.red - colorB.red, colorA.green - colorB.green, colorA.blue - colorB.blue, colorA.opacity - colorB.opacity);
+
+    return _subtract;
   }
 
   randSign() {

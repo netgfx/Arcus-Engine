@@ -31,6 +31,10 @@ class SpriteDriverCanvas extends CustomPainter {
   int currentTime = 0;
   int oldTimestamp = 0;
   int fps = 24;
+  double frame = 0;
+/** How many seconds each frame lasts, engine uses a fixed time step
+ *  @default 1/60 */
+  double timeDelta = 1 / 60;
   int printTime = DateTime.now().millisecondsSinceEpoch;
   int timeDecay = 0;
   int timeToLive = 24;
@@ -71,6 +75,8 @@ class SpriteDriverCanvas extends CustomPainter {
   }) : super(repaint: controller) {
     /// the delay in ms based on desired fps
     timeDecay = (1 / fps * 1000).round();
+    timeDelta = 1 / fps;
+    GameObject.shared.timeDelta = timeDelta;
     this.cameraProps = cameraProps;
 
     /// calculate world bounds
@@ -141,13 +147,13 @@ class SpriteDriverCanvas extends CustomPainter {
         var lastElapsed = (controller!.lastElapsedDuration!.inMilliseconds - oldTimestamp) / 1000;
         oldTimestamp = controller!.lastElapsedDuration!.inMilliseconds;
 
-        /// save to world
-        GameObject.shared.time = controller!.lastElapsedDuration!.inMilliseconds.toDouble();
+        GameObject.shared.frameTime = controller!.lastElapsedDuration!.inMilliseconds.toDouble();
 
         /// in order to run in our required frames per second
         if (controller!.lastElapsedDuration!.inMilliseconds - currentTime >= timeDecay) {
           /// reset the time
-
+          /// save to world
+          GameObject.shared.time = ++frame / fps;
           currentTime = controller!.lastElapsedDuration!.inMilliseconds;
 
           /// combine local list and global display list

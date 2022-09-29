@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,7 @@ class TextObject {
   late TextPainter textPainter;
   double angle = 0.0;
   double scale = 1.0;
+  PhysicsBodySimple? physicsBody;
 
   /// constructor
   TextObject({

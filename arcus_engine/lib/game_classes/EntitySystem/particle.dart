@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/shape_maker.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:flutter/foundation.dart';
@@ -17,42 +18,79 @@ class Particle {
   Color colorEnd = const Color(0xfff);
   double scale = 0.0;
   double lifetime = 1.0;
-  bool alive = false;
+  bool alive = true;
   Function? destroyCallback = null;
   double sizeStart = 0;
   double sizeEnd = 0;
   double fadeRate = 1.0;
   bool destroyed = false;
+  int zIndex = 0;
+  PhysicsBodySimple? physicsBody;
   double spawnTime = GameObject.shared.time;
   late ShapeMaker renderer;
+  TDWorld? world;
+  bool interactive = false;
+  ShapeType shape = ShapeType.Circle;
 
-  Particle({required this.pos, angle, physicsProperties, colorStart, colorEnd, sizeStart, sizeEnd, lifetime, fadeRate, spawnTime, destroyCallback}) {
+  Particle({
+    required this.pos,
+    shape,
+    angle,
+    physicsProperties,
+    colorStart,
+    colorEnd,
+    sizeStart,
+    sizeEnd,
+    lifetime,
+    fadeRate,
+    spawnTime,
+    destroyCallback,
+  }) {
+    this.angle = angle ?? 0;
+    this.colorStart = colorStart ?? Color.fromRGBO(0, 0, 0, 1);
+    this.colorEnd = colorEnd ?? Color.fromRGBO(0, 0, 0, 1);
+    this.physicsProperties = physicsProperties ?? PhysicsBodyProperties();
+    this.sizeStart = sizeStart ?? 0;
+    this.sizeEnd = sizeEnd ?? 0;
+    this.lifetime = lifetime ?? 1.0;
+    this.fadeRate = fadeRate ?? 0.1;
+    this.spawnTime = spawnTime ?? GameObject.shared.time;
+    this.destroyCallback = destroyCallback ?? () => {};
+    this.shape = shape ?? ShapeType.Circle;
+    //print("${GameObject.shared.time}, $spawnTime, $lifetime");
+    world = GameObject.shared.getWorld();
     var p = min((GameObject.shared.time - spawnTime) / lifetime, 1);
     spawnTime = GameObject.shared.time;
     var radius = sizeStart + p * sizeEnd;
     var size = Vector2(x: radius, y: radius);
     renderer = ShapeMaker(
-      type: ShapeType.Circle,
+      type: shape,
       physicsProperties: physicsProperties,
       enablePhysics: true,
-      position: pos,
-      size: size,
+      position: Point<double>(pos.x, pos.y),
+      size: Size(size.x, size.y),
       radius: radius,
       startAlive: true,
     );
+    physicsBody = renderer.physicsBody;
     destroyCallback = destroyCallback;
   }
 
   update(Canvas canvas, {double elapsedTime = 0, double timestamp = 0.0, bool shouldUpdate = true}) {
+    if (shouldUpdate == false) {
+      renderer.update(canvas, elapsedTime: elapsedTime, timestamp: timestamp, shouldUpdate: shouldUpdate);
+      return;
+    }
+
     var p = min((GameObject.shared.time - spawnTime) / lifetime, 1);
     var radius = sizeStart + p * sizeEnd;
     var size = Vector2(x: radius, y: radius);
     var fadeRate = this.fadeRate / 2;
-    var color = Color.fromRGBO(
+    Color color = Color.fromRGBO(
         (colorStart.red + p * colorEnd.red).toInt(),
         (colorStart.green + p * colorEnd.green).toInt(),
         (colorStart.blue + p * colorEnd.blue).toInt(),
-        (colorStart.alpha + p * colorEnd.alpha) *
+        (colorStart.opacity + p * colorEnd.opacity) *
             (p < fadeRate
                 ? p / fadeRate
                 : p > 1 - fadeRate
@@ -61,20 +99,29 @@ class Particle {
 
     final paint = Paint()
       ..color = color
-      ..blendMode = ui.BlendMode.src
+      //..blendMode = ui.BlendMode.src
       ..style = PaintingStyle.fill;
 
+    renderer.paint = paint;
+    renderer.update(canvas, elapsedTime: elapsedTime, timestamp: timestamp, shouldUpdate: shouldUpdate);
+
+    ///physicsBody = renderer.physicsBody;
     if (p == 1) {
       destroy();
     }
   }
 
   destroy() {
-    print("destroyed");
+    //print("destroyed");
+    alive = false;
+    destroyed = true;
+
     if (destroyCallback != null) {
       destroyCallback!(id);
     }
-    alive = false;
-    destroyed = true;
+
+    if (world != null) {
+      world!.remove(this, null);
+    }
   }
 }
