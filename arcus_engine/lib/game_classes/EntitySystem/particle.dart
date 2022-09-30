@@ -24,7 +24,7 @@ class Particle {
   double sizeEnd = 0;
   double fadeRate = 1.0;
   bool destroyed = false;
-  int zIndex = 0;
+  int zIndex = 99;
   PhysicsBodySimple? physicsBody;
   bool enablePhysics = false;
   double spawnTime = GameObject.shared.time;
@@ -33,6 +33,7 @@ class Particle {
   bool interactive = false;
   ShapeType shape = ShapeType.Circle;
   var paint = Paint();
+
   Particle({
     required this.pos,
     shape,

@@ -167,7 +167,7 @@ class SpriteDriverCanvas extends CustomPainter {
           for (var item in sprites) {
             if (item.alive == true) {
               //depth sort
-              depthSort();
+              //depthSort();
               // update
               item.update(
                 canvas,
