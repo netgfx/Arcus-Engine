@@ -108,12 +108,16 @@ class TextObject {
         style: TextStyle(
           //backgroundColor: Colors.black,
           foreground: paint,
-          fontSize: this.fontSize,
-          fontStyle: this.fontStyle,
-          fontWeight: this.fontWeight,
-          fontFamily: this.fontFamily,
+          fontSize: fontSize,
+          fontStyle: fontStyle,
+          fontWeight: fontWeight,
+          fontFamily: fontFamily,
         ));
-    textPainter = TextPainter(text: textSpan, maxLines: maxLines, textDirection: TextDirection.ltr);
+    textPainter = TextPainter(
+      text: textSpan,
+      maxLines: maxLines,
+      textDirection: TextDirection.ltr,
+    );
   }
 
   setText(String value) {
@@ -182,7 +186,7 @@ class TextObject {
     _applyText();
     performLayout();
     updateCanvas(canvas, position.x + (cameraPos.left * -1), position.y + (cameraPos.top * -1), angle, scale, () {
-      textPainter.paint(canvas, Offset(position.x, position.y));
+      textPainter.paint(canvas, Offset(0, 0));
     }, translate: true);
   }
 
@@ -244,8 +248,8 @@ class TextObject {
       //if (translate) {
       //canvas.translate(_x - size.width / 2, _y - size.height / 2);
       //}
+      canvas.translate(_x, _y);
       canvas.scale(scale);
-      canvas.translate(-_x, -_y);
     }
 
     if (rotate != null) {

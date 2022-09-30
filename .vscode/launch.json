@@ -1,0 +1,54 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "canvaskit",
+            "cwd": "examples\\basic_functionalities",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "-d",
+                "chrome",
+                "--web-renderer",
+                "canvaskit",
+            ]
+        },
+        {
+            "name": "debug_option_2 (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": [
+                "-d",
+                "chrome",
+                "--web-renderer",
+                "html",
+            ]
+        },
+        
+        {
+            "name": "basic_functionalities",
+            "cwd": "examples\\basic_functionalities",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "basic_functionalities (profile mode)",
+            "cwd": "examples\\basic_functionalities",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "basic_functionalities (release mode)",
+            "cwd": "examples\\basic_functionalities",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

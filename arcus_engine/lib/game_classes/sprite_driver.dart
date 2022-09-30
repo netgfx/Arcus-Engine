@@ -127,7 +127,7 @@ class SpriteDriverCanvas extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
+    return true;
   }
 
   void draw(Canvas canvas, Size size) {
@@ -220,14 +220,14 @@ class SpriteDriverCanvas extends CustomPainter {
             this.eventPoint = Point<double>(0, 0);
           }
         } else {
-          for (var item in this.sprites) {
+          for (var item in sprites) {
             if (item.alive == true) {
               //depth sort
-              this.depthSort();
+              depthSort();
               // update
               item.update(
                 canvas,
-                elapsedTime: this.currentTime.toDouble(),
+                elapsedTime: currentTime.toDouble(),
                 timestamp: lastElapsed,
                 shouldUpdate: false,
               );
@@ -236,6 +236,19 @@ class SpriteDriverCanvas extends CustomPainter {
         }
       } else {
         print("no elapsed duration");
+        for (var item in sprites) {
+          if (item.alive == true) {
+            //depth sort
+            depthSort();
+            // update
+            item.update(
+              canvas,
+              elapsedTime: currentTime.toDouble(),
+              timestamp: 0,
+              shouldUpdate: false,
+            );
+          }
+        }
       }
     } else {
       print("no controller running");

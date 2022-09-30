@@ -178,7 +178,7 @@ class Sprite with SpriteArchetype {
         ),
         paint,
       );
-    }, translate: false);
+    }, translate: true);
   }
 
   void setCache() {

@@ -113,7 +113,7 @@ class GroupController {
     double width = 0;
     double height = 0;
 
-    for (var item in this.items) {
+    for (var item in items) {
       // check the further x+width for max
       if (item["object"].position.x + item["object"].size.width > width) {
         width = item["groupPosition"].x + item["object"].size.width;
@@ -136,11 +136,13 @@ class GroupController {
     double timestamp = 0.0,
     bool shouldUpdate = true,
   }) {
-    for (var item in this.items) {
-      item["object"].position = Point(this.position.x + item["groupPosition"].x, this.position.y + item["groupPosition"].y);
+    for (var item in items) {
+      var posX = position.x + item["groupPosition"].x;
+      var posY = position.y + item["groupPosition"].y;
+      item["object"].position = Point(posX, posY);
       item["object"].update(canvas, elapsedTime: elapsedTime, shouldUpdate: shouldUpdate);
     }
-    this.size = _calculateSize();
+    size = _calculateSize();
 
     if (enableDebug == true) {
       drawDebugRect(canvas);
@@ -159,9 +161,9 @@ class GroupController {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.square
       ..strokeWidth = 2;
-    updateCanvas(canvas, (cameraPos.left * -1), (cameraPos.top * -1), null, () {
+    updateCanvas(canvas, position.x + (cameraPos.left * -1), position.y + (cameraPos.top * -1), null, () {
       //print("group size is: ${this.size.width}, ${this.size.height}");
-      canvas.drawRect(Rect.fromLTWH(this.position.x, this.position.y, this.size.width, this.size.height), border);
+      canvas.drawRect(Rect.fromLTWH(position.x + (cameraPos.left * -1), position.y + (cameraPos.top * -1), size.width, size.height), border);
     }, translate: true);
   }
 

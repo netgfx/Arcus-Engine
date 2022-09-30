@@ -42,8 +42,10 @@ class ParticleEmitter {
   bool alive = false;
   bool destroyed = false;
   int zIndex = 99;
+  bool interactive = false;
   ShapeType shape = ShapeType.Circle;
   TDWorld? world;
+  int initialDelay = 2;
   PhysicsBodySimple? physicsBody;
 
   ParticleEmitter({
@@ -104,23 +106,34 @@ class ParticleEmitter {
     spawnTime = GameObject.shared.time;
     children = [];
     collideTiles = true;
+
+    /// make particles
+    var particle;
+    for (var i = 0; i < 100; i++) {
+      particle = createParticle();
+
+      children.add(particle);
+    }
   }
 
   update(Canvas canvas, {double elapsedTime = 0, double timestamp = 0.0, bool shouldUpdate = true}) {
-    if (getAliveTime() <= emitTime) {
-      // emit particles
-      world = GameObject.shared.getWorld();
-      if (emitRate * particleEmitRateScale != 0) {
-        var rate = 1 / emitRate / particleEmitRateScale;
-        for (emitTimeBuffer += GameObject.shared.timeDelta; emitTimeBuffer > 0; emitTimeBuffer -= rate) {
-          var particle = emitParticle();
-          if (world != null) {
-            world!.add(particle, null);
+    if (GameObject.shared.time > initialDelay) {
+      if (getAliveTime() <= emitTime) {
+        // emit particles
+        world = GameObject.shared.getWorld();
+        if (emitRate * particleEmitRateScale != 0) {
+          var rate = (1 / emitRate) / particleEmitRateScale;
+          var particle;
+          for (emitTimeBuffer += GameObject.shared.timeDelta; emitTimeBuffer > 0; emitTimeBuffer -= rate) {
+            particle = emitParticle();
           }
         }
+      } else {
+        destroy();
       }
     } else {
-      destroy();
+      spawnTime = GameObject.shared.time;
+      //print(GameObject.shared.time);
     }
   }
 
@@ -136,7 +149,13 @@ class ParticleEmitter {
   }
 
   emitParticle() {
-    //print("emitting particle");
+    var result = children.where((element) => element.alive == false);
+    if (result.length > 0) {
+      result.first.init();
+    }
+  }
+
+  createParticle() {
     var pos = (Vector2(x: Utils.shared.rand(a: -.5, b: .5), y: Utils.shared.rand(a: -.5, b: .5))).multiply(emitSize).rotate(angle); // box emitter
     //Utils.shared.randInCircle(radius: emitSize.x * .5);
 
@@ -159,35 +178,39 @@ class ParticleEmitter {
     // build particle settings
 
     var particle = Particle(
-        pos: this.pos.add(pos),
-        shape: shape,
-        spawnTime: GameObject.shared.time.toDouble(),
-        angle: angle + Utils.shared.rand(a: particleConeAngle, b: -particleConeAngle),
-        physicsProperties: PhysicsBodyProperties(
-          velocity: (Vector2(x: 0, y: 0)).setAngle(angle + coneAngle, a: speed),
-          friction: 0.8,
-          damping: damping,
-          angleDamping: angleDamping,
-          gravityScale: gravityScale,
-          collideOnWorldBounds: true,
-          collideSolidObjects: true,
-          renderOrder: renderOrder,
-          angleVelocity: angleSpeed,
-          mass: 1,
-          restitution: 0.86,
-        ),
-        lifetime: particleTime,
-        sizeStart: sizeStart,
-        sizeEnd: sizeEnd - sizeStart,
-        fadeRate: fadeRate,
-        colorStart: colorStart,
-        colorEnd: Utils.shared.subtractColor(colorEnd, colorStart),
-        destroyCallback: onParticleDestroy);
+      pos: this.pos.add(pos),
+      shape: shape,
+      spawnTime: GameObject.shared.time.toDouble(),
+      angle: angle + Utils.shared.rand(a: particleConeAngle, b: -particleConeAngle),
+      enablePhysics: true,
+      physicsProperties: PhysicsBodyProperties(
+        velocity: (Vector2(x: 0, y: 0)).setAngle(angle + coneAngle, a: speed),
+        friction: 0.8,
+        damping: damping,
+        angleDamping: angleDamping,
+        gravityScale: gravityScale,
+        collideOnWorldBounds: true,
+        collideSolidObjects: true,
+        renderOrder: renderOrder,
+        angleVelocity: angleSpeed,
+        mass: 1,
+        restitution: 0.86,
+      ),
+      lifetime: particleTime,
+      sizeStart: sizeStart,
+      sizeEnd: sizeEnd - sizeStart,
+      fadeRate: fadeRate,
+      colorStart: colorStart,
+      startAlive: false,
+      colorEnd: Utils.shared.subtractColor(colorEnd, colorStart),
+      //destroyCallback: onParticleDestroy,
+    );
 
     return particle;
   }
 
   onParticleDestroy(id) {
+    //children.removeWhere((element) => element.id == id);
     //print("particle destroyed $id");
   }
 }

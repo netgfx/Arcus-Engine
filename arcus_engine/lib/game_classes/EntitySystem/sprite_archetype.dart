@@ -190,6 +190,7 @@ mixin SpriteArchetype {
     if (scale != null) {
       canvas.translate(_x, _y);
       canvas.scale(scale);
+      canvas.translate(-_x, -_y);
     }
 
     if (rotation != null) {

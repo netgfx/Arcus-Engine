@@ -48,6 +48,7 @@ class ShapeMaker {
   TDWorld? world = GameObject.shared.getWorld();
   PhysicsBodyProperties physicsBodyProperties = PhysicsBodyProperties();
   Function? _onCollide;
+  bool batchDraw = false;
 
   ShapeMaker({
     required this.type,
@@ -63,6 +64,7 @@ class ShapeMaker {
     interactive,
     enablePhysics,
     physicsProperties,
+    batchDraw,
     onCollide,
   }) {
     this.size = size ?? Size(20, 20);
@@ -75,6 +77,7 @@ class ShapeMaker {
     this.zIndex = zIndex ?? 0;
     this.interactive = interactive ?? false;
     this.enablePhysics = enablePhysics ?? false;
+    this.batchDraw = batchDraw ?? false;
     //
     if (startAlive == true) {
       this.alive = true;
@@ -197,16 +200,25 @@ class ShapeMaker {
   }
 
   void drawCircle(Canvas canvas) {
-    updateCanvas(canvas, this.position.x, this.position.y, 0, () {
-      canvas.drawCircle(Offset.zero, radius, paint);
-    });
+    if (batchDraw == true) {
+      canvas.drawCircle(Offset(this.position.x, this.position.y), radius, paint);
+    } else {
+      updateCanvas(canvas, this.position.x, this.position.y, 0, () {
+        canvas.drawCircle(Offset.zero, radius, paint);
+      });
+    }
   }
 
   void drawRRect(Canvas canvas, {double? cornerRadius}) {
-    updateCanvas(canvas, 0, 0, 0, () {
+    if (batchDraw == true) {
       Rect rect = Rect.fromLTWH(0, 0, this.size.width, this.size.height);
       canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(cornerRadius ?? radius * 0.2)), this.paint);
-    });
+    } else {
+      updateCanvas(canvas, 0, 0, 0, () {
+        Rect rect = Rect.fromLTWH(0, 0, this.size.width, this.size.height);
+        canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(cornerRadius ?? radius * 0.2)), this.paint);
+      });
+    }
   }
 
   void drawPolygon(Canvas canvas, int num, {double initialAngle = 0}) {
@@ -259,9 +271,13 @@ class ShapeMaker {
   }
 
   void drawRect(Canvas canvas) {
-    updateCanvas(canvas, this.position.x, this.position.y, this.angle, () {
-      canvas.drawRect(Rect.fromLTWH(0, 0, this.size.width, this.size.height), this.paint);
-    });
+    if (batchDraw == true) {
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
+    } else {
+      updateCanvas(canvas, this.position.x, this.position.y, this.angle, () {
+        canvas.drawRect(Rect.fromLTWH(0, 0, this.size.width, this.size.height), this.paint);
+      });
+    }
   }
 
   bool get interactive {

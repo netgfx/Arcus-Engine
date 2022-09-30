@@ -10,6 +10,7 @@ import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart'
 import 'package:arcus_engine/game_classes/EntitySystem/text_object.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/helpers/game_object.dart';
+import 'package:arcus_engine/helpers/utils.dart';
 import 'package:arcus_engine/helpers/vector_little.dart' as vec2;
 import 'package:arcus_engine/helpers/sound_manager.dart';
 import 'package:arcus_engine/helpers/vector_little.dart';
@@ -130,7 +131,7 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     List<dynamic> sprites = [];
 
     GroupController group = GroupController(
-      position: Point(100.0, 400.0),
+      position: Point(100.0, 100.0),
       startAlive: true,
     );
     group.zIndex = 1;
@@ -144,17 +145,18 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         startAlive: true,
         scale: 0.8,
         fitParent: false,
+        enablePhysics: false,
         centerOffset: const Offset(0, 0),
       ),
     );
 
     sprites = [
       // Sprite(
-      //   position: const Point<double>(250.0, 40.0),
-      //   textureName: "redblock",
-      //   scale: 0.28,
+      //   position: const Point<double>(100.0, 100.0),
+      //   textureName: "mage1",
+      //   scale: 0.2,
       //   zIndex: 2,
-      //   enablePhysics: true,
+      //   enablePhysics: false,
       //   startAlive: true,
       //   fitParent: false,
       //   centerOffset: const Offset(0, 0),
@@ -202,34 +204,37 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         interactive: true,
       ),
       TextObject(
-          id: "mainText",
-          text: "Hello Arcus!",
-          position: vec2.Vector2(x: 100, y: 250),
-          fontSize: 56,
-          color: Colors.green,
-          startAlive: true,
-          zIndex: 1,
-          maxLines: 2,
-          border: true,
-          borderWidth: 1,
-          borderColor: Colors.orange,
-          maxWidth: 400,
-          fontFamily: "IrishGrover"),
-      ParticleEmitter(
-          pos: Vector2(x: 250.0, y: 300.0),
-          emitSize: Vector2(x: 100, y: 100),
-          emitTime: 0.5, // in s
-          emitRate: 100,
-          emitConeAngle: pi,
-          startColor: const Color.fromRGBO(255, 0, 128, 1),
-          endColor: const Color.fromRGBO(255, 0, 0, 1),
-          particleTime: 3,
-          fadeRate: 0.55,
-          randomness: 1,
-          collideTiles: true,
-          randomColorLinear: true,
-          renderOrder: 1,
-          startAlive: true),
+        id: "mainText",
+        text: "Hello Arcus!",
+        position: vec2.Vector2(x: 100, y: 100),
+        fontSize: 56,
+        color: Colors.green,
+        startAlive: true,
+        zIndex: 2,
+        maxLines: 2,
+        border: true,
+        borderWidth: 1,
+        borderColor: Colors.orange,
+        maxWidth: 400,
+        fontFamily: "IrishGrover",
+      ),
+      // ParticleEmitter(
+      //     pos: Vector2(x: 250.0, y: 320.0),
+      //     emitSize: Vector2(x: 100, y: 100),
+      //     sizeStart: 5,
+      //     sizeEnd: 2.5,
+      //     emitTime: 0.4, // in s
+      //     emitRate: 200,
+      //     emitConeAngle: pi,
+      //     startColor: const Color.fromRGBO(255, 0, 128, 1),
+      //     endColor: const Color.fromRGBO(255, 0, 0, 1),
+      //     particleTime: 3,
+      //     fadeRate: 0.45,
+      //     randomness: 1,
+      //     collideTiles: false,
+      //     randomColorLinear: true,
+      //     renderOrder: 1,
+      //     startAlive: true),
       // ShapeMaker(
       //   type: ShapeType.Rect,
       //   position: const Point<double>(200.0, 250.0),
@@ -254,6 +259,33 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       // ),
     ];
 
+    /// performance debug
+    // for (var i = 0; i < 100; i++) {
+    //   var shape = ShapeMaker(
+    //     type: ShapeType.Rect,
+    //     position: Point<double>(Utils.shared.rand(a: 0, b: 500), Utils.shared.rand(a: 50.0, b: 250.0)),
+    //     radius: 20,
+    //     size: const Size(300, 10),
+    //     zIndex: 1,
+    //     interactive: false,
+    //     paintOptions: {
+    //       "color": Colors.red,
+    //       "paintingStyle": ui.PaintingStyle.fill,
+    //     },
+    //     startAlive: true,
+    //     enablePhysics: false,
+    //     batchDraw: false,
+    //     physicsProperties: PhysicsBodyProperties(
+    //       velocity: Vector2(x: 0, y: 0),
+    //       restitution: 0.9,
+    //       friction: 0.95,
+    //       mass: 1000,
+    //       immovable: true,
+    //     ),
+    //   );
+
+    //   sprites.add(shape);
+    // }
     setState(() {
       spritesArr = sprites;
     });
@@ -350,25 +382,29 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
                         child: Padding(
                           padding: const EdgeInsets.only(top: 0, left: 0),
                           child: Stack(children: [
-                            CustomPaint(
-                              key: UniqueKey(),
-                              painter: SpriteDriverCanvas(
-                                controller: _controller,
-                                fps: 30,
-                                sprites: spritesArr,
-                                cache: cache,
-                                actions: cache.isEmpty() ? null : actions,
-                                width: viewportConstraints.maxWidth,
-                                height: viewportConstraints.maxHeight,
-                                cameraProps: CameraProps(
-                                  enabled: true,
-                                  canvasSize: Size(viewportConstraints.maxWidth, viewportConstraints.maxHeight),
-                                  mapSize: Size(
-                                    viewportConstraints.maxWidth,
-                                    viewportConstraints.maxHeight,
+                            RepaintBoundary(
+                              child: CustomPaint(
+                                key: UniqueKey(),
+                                isComplex: true,
+                                willChange: true,
+                                painter: SpriteDriverCanvas(
+                                  controller: _controller,
+                                  fps: 60,
+                                  sprites: spritesArr,
+                                  cache: cache,
+                                  actions: cache.isEmpty() ? null : actions,
+                                  width: viewportConstraints.maxWidth,
+                                  height: viewportConstraints.maxHeight,
+                                  cameraProps: CameraProps(
+                                    enabled: true,
+                                    canvasSize: Size(viewportConstraints.maxWidth, viewportConstraints.maxHeight),
+                                    mapSize: Size(
+                                      viewportConstraints.maxWidth,
+                                      viewportConstraints.maxHeight,
+                                    ),
+                                    followObject: "bat",
+                                    offset: const Point<double>(0.0, 0.0),
                                   ),
-                                  followObject: "bat",
-                                  offset: const Point<double>(0.0, 0.0),
                                 ),
                               ),
                             ),
