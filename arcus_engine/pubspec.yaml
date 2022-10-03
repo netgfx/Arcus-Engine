@@ -21,7 +21,7 @@ dev_dependencies:
   args: ^2.1.0
   simple_animations: ^3.1.1
   supercharged: ^2.0.0
-  #tiled: ^0.8.4
+  tiled: ^0.9.0
   csv: ^5.0.1
   bezier: ^1.2.0 
   collection: ^1.16.0
