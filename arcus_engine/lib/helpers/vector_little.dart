@@ -17,9 +17,7 @@ import 'package:arcus_engine/helpers/utils.dart';
  * @memberof Utilities
  */
 vec2({x = 0, y}) {
-  x.x == null
-      ? new Vector2(x: x, y: y == null ? x : y)
-      : new Vector2(x: x.x, y: x.y);
+  x.x == null ? new Vector2(x: x, y: y == null ? x : y) : new Vector2(x: x.x, y: x.y);
 }
 
 /** 
@@ -150,7 +148,7 @@ class Vector2 {
   /** Sets this vector with angle and length passed in
      * @param {Number} [angle=0]
      * @param {Number} [length=1] */
-  setAngle(rand, {a = 0, length = 1}) {
+  setAngle({a = 0, length = 1}) {
     this.x = length * sin(a);
     this.y = length * cos(a);
     return this;
@@ -206,10 +204,7 @@ class Vector2 {
      * @param {Vector2} arraySize
      * @return {Boolean} */
   arrayCheck(arraySize) {
-    return this.x >= 0 &&
-        this.y >= 0 &&
-        this.x < arraySize.x &&
-        this.y < arraySize.y;
+    return this.x >= 0 && this.y >= 0 && this.x < arraySize.x && this.y < arraySize.y;
   }
 
   /** Returns this vector expressed as a string

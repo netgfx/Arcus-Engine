@@ -80,16 +80,16 @@ class ShapeMaker {
     this.batchDraw = batchDraw ?? false;
     //
     if (startAlive == true) {
-      this.alive = true;
+      _alive = true;
     }
 
     if (paintOptions != null) {
-      this.paint = Paint()
-        ..color = paintOptions["color"] ?? this._color
+      paint = Paint()
+        ..color = paintOptions["color"] ?? _color
         ..style = paintOptions["paintingStyle"] ?? PaintingStyle.fill;
     } else {
-      this.paint = Paint()
-        ..color = this._color
+      paint = Paint()
+        ..color = _color
         ..style = PaintingStyle.fill;
     }
 
@@ -201,9 +201,9 @@ class ShapeMaker {
 
   void drawCircle(Canvas canvas) {
     if (batchDraw == true) {
-      canvas.drawCircle(Offset(this.position.x, this.position.y), radius, paint);
+      canvas.drawCircle(Offset(position.x, position.y), radius, paint);
     } else {
-      updateCanvas(canvas, this.position.x, this.position.y, 0, () {
+      updateCanvas(canvas, position.x, position.y, 0, () {
         canvas.drawCircle(Offset.zero, radius, paint);
       });
     }

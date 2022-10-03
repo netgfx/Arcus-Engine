@@ -18,15 +18,16 @@
             ]
         },
         {
-            "name": "debug_option_2 (release mode)",
+            "name": "canvaskit (profile)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release",
+            "cwd": "examples\\basic_functionalities",
+            "flutterMode": "profile",
             "args": [
                 "-d",
                 "chrome",
                 "--web-renderer",
-                "html",
+                "canvaskit",
             ]
         },
         

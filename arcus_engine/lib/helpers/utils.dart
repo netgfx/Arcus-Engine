@@ -820,7 +820,8 @@ class Utils {
  *  @return {Vector2}
  *  @memberof Random */
   randVector({length = 1}) {
-    return vector2.Vector2().setAngle(rand(a: 2 * pi), length: length);
+    //rand(a: 2 * pi),
+    return vector2.Vector2().setAngle(length: length);
   }
 
   /** Returns a random value between the two values passed in

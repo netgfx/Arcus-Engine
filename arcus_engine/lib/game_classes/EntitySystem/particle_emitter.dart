@@ -45,7 +45,7 @@ class ParticleEmitter {
   bool interactive = false;
   ShapeType shape = ShapeType.Circle;
   TDWorld? world;
-  int initialDelay = 2;
+  int initialDelay = 1;
   PhysicsBodySimple? physicsBody;
 
   ParticleEmitter({
@@ -78,7 +78,7 @@ class ParticleEmitter {
     this.angle = angle ?? 0;
     this.shape = shape ?? ShapeType.Circle;
     this.emitSize = emitSize ?? Vector2(x: 0, y: 0);
-    this.emitTime = emitTime ?? 0;
+    this.emitTime = emitTime ?? 0.5;
     this.emitRate = emitRate ?? 100;
     this.emitConeAngle = emitConeAngle ?? pi;
     this.startColor = startColor ?? Color(0x000);
@@ -98,7 +98,7 @@ class ParticleEmitter {
     this.additive = additive ?? false;
     this.randomColorLinear = randomColorLinear ?? true;
     this.renderOrder = renderOrder ?? 0;
-    this.alive = startAlive ?? false;
+    alive = startAlive ?? false;
 
     world = GameObject.shared.getWorld();
 
@@ -120,53 +120,61 @@ class ParticleEmitter {
     if (GameObject.shared.time > initialDelay) {
       if (getAliveTime() <= emitTime) {
         // emit particles
-        world = GameObject.shared.getWorld();
+
         if (emitRate * particleEmitRateScale != 0) {
           var rate = (1 / emitRate) / particleEmitRateScale;
-          var particle;
+
           for (emitTimeBuffer += GameObject.shared.timeDelta; emitTimeBuffer > 0; emitTimeBuffer -= rate) {
-            particle = emitParticle();
+            emitParticle();
           }
         }
       } else {
         destroy();
       }
-    } else {
-      spawnTime = GameObject.shared.time;
-      //print(GameObject.shared.time);
     }
+    // } else {
+    //   if (getAliveTime() <= emitTime) {
+    //     spawnTime = GameObject.shared.time;
+    //   } else {
+    //     destroy();
+    //   }
+    //   //print(GameObject.shared.time);
+    // }
   }
 
   getAliveTime() {
-    var _timeElapsed = GameObject.shared.time - spawnTime;
+    var _timeElapsed = GameObject.shared.time - (spawnTime + initialDelay);
     return _timeElapsed;
   }
 
   destroy() {
     alive = false;
     destroyed = true;
+    children.clear();
     print("destroyed emitter");
   }
 
   emitParticle() {
-    var result = children.where((element) => element.alive == false);
-    if (result.length > 0) {
-      result.first.init();
+    if (alive == true) {
+      var result = children.where((element) => element.alive == false && element.destroyed == false);
+      if (result.isNotEmpty) {
+        result.first.init();
+      }
     }
   }
 
-  createParticle() {
+  createParticle({bool immediateRender = false}) {
     var pos = (Vector2(x: Utils.shared.rand(a: -.5, b: .5), y: Utils.shared.rand(a: -.5, b: .5))).multiply(emitSize).rotate(angle); // box emitter
     //Utils.shared.randInCircle(radius: emitSize.x * .5);
 
     // randomness scales each paremeter by a percentage
     var randomness = this.randomness;
-    randomizeScale(v) {
+    double randomizeScale(v) {
       return v + v * Utils.shared.rand(a: randomness, b: -randomness);
     }
 
     // randomize particle settings
-    var particleTime = randomizeScale(this.particleTime);
+    var particleTime = max(randomizeScale(this.particleTime), this.particleTime);
     var sizeStart = randomizeScale(this.sizeStart);
     var sizeEnd = randomizeScale(this.sizeEnd);
     var speed = randomizeScale(this.speed);
@@ -179,12 +187,13 @@ class ParticleEmitter {
 
     var particle = Particle(
       pos: this.pos.add(pos),
+      parent: this,
       shape: shape,
       spawnTime: GameObject.shared.time.toDouble(),
       angle: angle + Utils.shared.rand(a: particleConeAngle, b: -particleConeAngle),
       enablePhysics: true,
       physicsProperties: PhysicsBodyProperties(
-        velocity: (Vector2(x: Utils.shared.rand(a: -250, b: 250), y: Utils.shared.rand(a: -150, b: 150))),
+        velocity: Vector2(x: 0, y: 0).setAngle(a: angle + coneAngle, length: speed),
         //.setAngle(angle + coneAngle, a: speed),
         friction: 0.8,
         damping: damping,
@@ -203,7 +212,7 @@ class ParticleEmitter {
       sizeEnd: sizeEnd - sizeStart,
       fadeRate: fadeRate,
       colorStart: colorStart,
-      startAlive: false,
+      startAlive: immediateRender,
       colorEnd: Utils.shared.subtractColor(colorEnd, colorStart),
       //destroyCallback: onParticleDestroy,
     );

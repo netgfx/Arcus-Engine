@@ -83,6 +83,9 @@
 <br/>
 <hr/>
 <br/>
+
+## Web renderers
+https://docs.flutter.dev/development/platform-integration/web/renderers
 ### Sample games for v0.1
 
 - whack a mole

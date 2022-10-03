@@ -2,6 +2,7 @@ import 'dart:core';
 import 'dart:math';
 import 'dart:collection';
 
+import 'package:arcus_engine/game_classes/EntitySystem/particle.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
@@ -167,7 +168,8 @@ class SpriteDriverCanvas extends CustomPainter {
           for (var item in sprites) {
             if (item.alive == true) {
               //depth sort
-              //depthSort();
+              depthSort();
+
               // update
               item.update(
                 canvas,
@@ -199,9 +201,12 @@ class SpriteDriverCanvas extends CustomPainter {
               }
             } else {
               try {
-                if (item.destroyed) {
+                if (item.destroyed == true) {
                   // remove destroyed item
                   sprites.removeWhere((element) => element.id == item.id);
+                  if (_world != null) {
+                    _world!.remove(item, null);
+                  }
                 }
               } catch (e) {
                 /// no property
@@ -231,24 +236,36 @@ class SpriteDriverCanvas extends CustomPainter {
                 timestamp: lastElapsed,
                 shouldUpdate: false,
               );
+            } else {
+              try {
+                if (item.destroyed == true) {
+                  // remove destroyed item
+                  sprites.removeWhere((element) => element.id == item.id);
+                  if (_world != null) {
+                    _world!.remove(item, null);
+                  }
+                }
+              } catch (e) {
+                /// no property
+              }
             }
           }
         }
       } else {
         print("no elapsed duration");
-        for (var item in sprites) {
-          if (item.alive == true) {
-            //depth sort
-            depthSort();
-            // update
-            item.update(
-              canvas,
-              elapsedTime: currentTime.toDouble(),
-              timestamp: 0,
-              shouldUpdate: false,
-            );
-          }
-        }
+        // for (var item in sprites) {
+        //   if (item.alive == true) {
+        //     //     //depth sort
+        //     depthSort();
+        //     //     // update
+        //     item.update(
+        //       canvas,
+        //       elapsedTime: currentTime.toDouble(),
+        //       timestamp: 0,
+        //       shouldUpdate: false,
+        //     );
+        //   }
+        // }
       }
     } else {
       print("no controller running");
