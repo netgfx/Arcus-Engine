@@ -77,8 +77,10 @@ class TilemapController {
             /// if not 0
             var textureCoords = Vector2(x: 0, y: 0);
             double ratio = textureColumns / textureRows;
-            int modY = (texturePos - 1 % textureRows) / ratio;
-            double posX = (texturePos - 1 / textureRows) - (texturePos - 1 % textureRows) * textureColumns;
+            double modY = (texturePos - 1) % textureRows;
+            double posX1 = textureColumns.toDouble() * modY;
+            double diff = (posX1 - texturePos).abs();
+            double posX = (textureColumns - diff);
             print("$modY, $posX");
             counter += 1;
             tiles.add({"texturePos": Vector2(x: posX, y: modY)});
@@ -89,7 +91,8 @@ class TilemapController {
   }
 
   void setCache() {
-    Map<String, dynamic>? cacheItem = GameObject.shared.getSpriteCache().getItem(cacheKey);
+    Map<String, dynamic>? cacheItem =
+        GameObject.shared.getSpriteCache().getItem(cacheKey);
     if (cacheItem != null) {
       cacheData = cacheItem;
     }
