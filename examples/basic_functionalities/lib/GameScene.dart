@@ -8,6 +8,7 @@ import 'package:arcus_engine/game_classes/EntitySystem/bitmap_font.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/particle_emitter.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/text_object.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/tilemap_controller.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/utils.dart';
@@ -102,6 +103,12 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         texturePath: "assets/fonts/mageGreen.png",
         dataPath: "assets/fonts/mageGreen.fnt",
         dataType: "xml",
+      );
+      cache.addItem(
+        "tilemap",
+        texturePath: "assets/tiles/tiles_packed.png",
+        dataPath: "assets/tiles/tilemap.tmj",
+        dataType: "tilemap",
       );
 
       cache.addItem(
@@ -219,25 +226,30 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
         maxWidth: 400,
         fontFamily: "IrishGrover",
       ),
-      ParticleEmitter(
-        pos: Vector2(x: 250.0, y: 320.0),
-        emitSize: Vector2(x: 100, y: 100),
-        sizeStart: 4,
-        sizeEnd: 2,
-        emitTime: 0.30, // in s
-        emitRate: 300,
-        emitConeAngle: pi,
-        startColor: const Color.fromRGBO(255, 0, 128, 1),
-        endColor: const Color.fromRGBO(255, 0, 0, 1),
-        particleTime: 0.15,
-        speed: 300,
-        fadeRate: 0.98,
-        randomness: 1,
-        collideTiles: false,
-        randomColorLinear: true,
-        renderOrder: 1,
+      TilemapController(
+        position: vec2.Vector2(x: 100, y: 100),
+        cacheKey: "tilemap",
         startAlive: true,
-      ),
+      )
+      // ParticleEmitter(
+      //   pos: Vector2(x: 250.0, y: 320.0),
+      //   emitSize: Vector2(x: 100, y: 100),
+      //   sizeStart: 4,
+      //   sizeEnd: 2,
+      //   emitTime: 0.30, // in s
+      //   emitRate: 300,
+      //   emitConeAngle: pi,
+      //   startColor: const Color.fromRGBO(255, 0, 128, 1),
+      //   endColor: const Color.fromRGBO(255, 0, 0, 1),
+      //   particleTime: 0.15,
+      //   speed: 300,
+      //   fadeRate: 0.98,
+      //   randomness: 1,
+      //   collideTiles: false,
+      //   randomColorLinear: true,
+      //   renderOrder: 1,
+      //   startAlive: true,
+      // ),
       // ShapeMaker(
       //   type: ShapeType.Rect,
       //   position: const Point<double>(200.0, 250.0),

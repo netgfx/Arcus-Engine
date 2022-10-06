@@ -5,6 +5,7 @@ import 'package:async/async.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'package:arcus_engine/helpers/utils.dart';
+import 'package:tiled/tiled.dart';
 
 class SpriteCache {
   String textureLoadState = "none";
@@ -50,6 +51,8 @@ class SpriteCache {
             _group.add(loadSprite(key));
           } else if (item["dataType"].toLowerCase() == "xml") {
             _group.add(loadBitmapFont(key));
+          } else if (item["dataType"].toLowerCase() == "tilemap") {
+            _group.add(loadTilemap(key));
           }
         }
       }
@@ -100,6 +103,24 @@ class SpriteCache {
     }
   }
 
+  Future<void> loadTilemap(String key) async {
+    _cache[key]["loadedState"] = "loading";
+    String texturePath = _cache[key]["texturePath"];
+    String dataPath = _cache[key]["dataPath"];
+    final ByteData data = await rootBundle.load(texturePath);
+    _cache[key]["texture"] = await Utils.shared.imageFromBytes(data);
+    _cache[key]["textureWidth"] = _cache[key]["texture"]!.width;
+    _cache[key]["textureHeight"] = _cache[key]["texture"]!.height;
+    if (dataPath != "") {
+      var data = await loadTileXMLData(dataPath);
+      _cache[key]["tileData"] = parseTiledJSON(key, data);
+
+      _cache[key]["loadedState"] = "done";
+    } else {
+      _cache[key]["loadedState"] = "none";
+    }
+  }
+
   /**
    * Load the json metadata of the sprite atlas
    */
@@ -112,6 +133,17 @@ class SpriteCache {
   Future<XmlDocument> loadXMLData(String path) async {
     var xmlText = await rootBundle.loadString(path);
     final data = XmlDocument.parse(xmlText);
+
+    return data;
+  }
+
+  /// TODO: add robust implementation
+  Future<Map<String, dynamic>> loadTileXMLData(String path) async {
+    var jsonText = await rootBundle.loadString(path);
+
+    Map<String, dynamic> data = json.decode(jsonText);
+    //final TiledMap data = TileMapParser.parseJson(xmlText);
+    //.parseTmx(xmlText, [CustomTsxProvider()]);
 
     return data;
   }
@@ -149,6 +181,36 @@ class SpriteCache {
   }
 
   /**
+   * Parse the json metadata into proper dictionary structure
+   */
+  Map<String, Map<String, dynamic>> parseTiledJSON(String key, Map<String, dynamic> data) {
+    Map<String, Map<String, dynamic>> sprites = {};
+
+    sprites[key] = {};
+    data.forEach((innerKey, value) {
+      // final int width = value['width'];
+      // final int height = value['height'];
+      // final List<int> layerData = value['layers']['data'];
+      // final int tileWidth = value["tilewidth"];
+      // final int tileHeight = value["tileheight"];
+      // final String renderorder = value["renderorder"];
+
+      /// we only support top-right for now
+      if (innerKey == "layers") {
+        List<dynamic> data = [];
+        for (var i = 0; i < value.length; i++) {
+          data.add(value[i]["data"]);
+        }
+        sprites[key]![innerKey] = data;
+      } else {
+        sprites[key]![innerKey] = value;
+      }
+    });
+
+    return sprites;
+  }
+
+  /**
    * Load a single image
    */
   Future<void> loadImage(String key) async {
@@ -178,5 +240,24 @@ class SpriteCache {
    */
   bool isEmpty() {
     return _cache.isEmpty;
+  }
+}
+
+class CustomTsxProvider extends TsxProvider {
+  @override
+  Parser getSource(String fileName) {
+    final xml = File(fileName).readAsStringSync();
+    final node = XmlDocument.parse(xml).rootElement;
+    return XmlParser(node);
+  }
+
+  @override
+  // TODO: implement filename
+  String get filename => throw UnimplementedError();
+
+  @override
+  Parser? getCachedSource() {
+    // TODO: implement getCachedSource
+    throw UnimplementedError();
   }
 }

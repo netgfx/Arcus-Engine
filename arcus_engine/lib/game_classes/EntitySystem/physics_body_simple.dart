@@ -40,6 +40,7 @@ class PhysicsBodyProperties {
   double angle = 0.0;
   bool collideWorldBounds = true;
   double restitution = 0.99;
+  bool isOnFloor = false;
 
   PhysicsBodyProperties({
     mass,
@@ -306,7 +307,7 @@ class PhysicsBodySimple {
 
     // // apply physics
     var oldPos = Vector2(x: pos.x.toDouble(), y: pos.y.toDouble());
-
+    var oldVelocity = Vector2(x: velocity.x, y: velocity.y);
     // if (isCollidingAt == "none") {
     velocity.y += gravity * timestamp;
     //damping *
@@ -317,11 +318,18 @@ class PhysicsBodySimple {
       velocity.x = 0;
       velocity.y = 0;
     } else {
-      pos = Vector2(x: oldPos.x + velocity.x * timestamp, y: oldPos.y + velocity.y * timestamp);
+      velocity.x *= timestamp;
+      velocity.y *= timestamp;
+      pos = Vector2(x: oldPos.x + velocity.x, y: oldPos.y + velocity.y);
 
       /// push outside of collision
       if (isCollidingAt == "bottom" && velocity.y > 0) {
         pos = oldPos;
+      }
+
+      if (isCollidingAt == "bottom" && velocity.y <= 0) {
+        var velocityX = oldVelocity.x + (velocity.x - oldVelocity.x) * friction;
+        velocity.x = velocityX;
       }
 
       angle += angleVelocity *= angleDamping;
@@ -396,7 +404,7 @@ class PhysicsBodySimple {
         isCollidingAt = wallCollision;
 
         if (isCollidingAt == "bottom") {
-          velocity.x = (velocity.x) * friction;
+          //velocity.x = (velocity.x) * friction;
         }
         return;
       }

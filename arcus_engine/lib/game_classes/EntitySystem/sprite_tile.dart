@@ -1,34 +1,29 @@
 import 'dart:math';
-import 'dart:typed_data';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
+import 'dart:ui';
 import 'package:arcus_engine/game_classes/EntitySystem/physics_body_simple.dart';
-import 'package:arcus_engine/game_classes/EntitySystem/sprite_archetype.dart';
-import 'package:arcus_engine/helpers/vector_little.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/helpers/game_object.dart';
-import 'package:arcus_engine/helpers/sprite_cache.dart';
-import 'package:vector_math/vector_math.dart' as vectorMath;
-import "package:bezier/bezier.dart";
-import "../../helpers/utils.dart";
+import 'package:arcus_engine/helpers/vector_little.dart';
+import 'package:flutter/widgets.dart';
+
 import '../../helpers/rectangle.dart';
 import 'dart:ui' as ui;
-import 'package:flutter/cupertino.dart';
+import 'package:arcus_engine/game_classes/EntitySystem/sprite_archetype.dart';
 
-class Sprite with SpriteArchetype {
-  String _id = UniqueKey().toString();
+class SpriteTile with SpriteArchetype {
+  String _id = "";
   int textureWidth = 0;
   int textureHeight = 0;
   TDWorld? world = GameObject.shared.getWorld();
   double _angle = 0;
   bool _alive = false;
-  bool? startAlive = false;
-  bool? _fitParent = true;
-  Offset _centerOffset = Offset(0, 0);
+  Offset _centerOffset = const Offset(0, 0);
   Function? _onCollide;
+  Vector2 clipCoordinates = Vector2(x: 0, y: 0);
 
   ///
-  Sprite({
+  SpriteTile({
+    required this.clipCoordinates,
     textureName,
     position,
     startAlive,
@@ -36,14 +31,13 @@ class Sprite with SpriteArchetype {
     onEvent,
     scale,
     id,
-    fitParent,
     centerOffset,
     zIndex,
     enablePhysics,
     physicsProperties,
     onCollide,
   }) {
-    this.textureName = textureName;
+    this.textureName = textureName ?? "";
     this.position = position ?? const Point(0.0, 0.0);
     _centerOffset = centerOffset ?? const Offset(0, 0);
     this.interactive = interactive ?? false;
@@ -55,7 +49,7 @@ class Sprite with SpriteArchetype {
     if (startAlive == true) {
       alive = true;
     }
-    _fitParent = fitParent ?? true;
+
     this.enablePhysics = enablePhysics ?? false;
     if (this.enablePhysics == true) {
       setupPhysicsBody();
@@ -82,10 +76,12 @@ class Sprite with SpriteArchetype {
     return size;
   }
 
+  @override
   String get id {
     return _id;
   }
 
+  @override
   set id(String value) {
     _id = value;
   }
@@ -140,25 +136,11 @@ class Sprite with SpriteArchetype {
       cameraPos = GameObject.shared.world!.getCamera().getCameraBounds();
     }
 
-    if (_fitParent == true) {
-      Size fitSize = Size(size.width, size.height);
-
-      updateCanvas(canvas, position.x + (cameraPos.left * -1), position.y + (cameraPos.top * -1), scale, angle, () {
-        if (GameObject.shared.world != null) {
-          Size bounds = GameObject.shared.getWorld()!.worldBounds;
-          final FittedSizes sizes = applyBoxFit(BoxFit.cover, size, bounds);
-          final Rect inputSubrect = Alignment.center.inscribe(sizes.source, Offset.zero & size);
-          final Rect outputSubrect = Alignment.center.inscribe(sizes.destination, Offset.zero & bounds);
-          canvas.drawImageRect(texture!, inputSubrect, outputSubrect, paint);
-        }
-      });
-    } else {
-      Point<double> pos = Point(
-        position.x - textureWidth.toDouble() * scale * _centerOffset.dx,
-        position.y - textureHeight.toDouble() * scale * _centerOffset.dy,
-      );
-      renderSprite(canvas, pos, cameraPos, paint);
-    }
+    Point<double> pos = Point(
+      position.x - textureWidth.toDouble() * scale * _centerOffset.dx,
+      position.y - textureHeight.toDouble() * scale * _centerOffset.dy,
+    );
+    renderSprite(canvas, pos, cameraPos, paint);
   }
 
   void renderSprite(Canvas canvas, Point<double> pos, Rect cameraPos, Paint paint) {
@@ -203,18 +185,22 @@ class Sprite with SpriteArchetype {
     return texture;
   }
 
+  @override
   double get angle {
     return _angle;
   }
 
+  @override
   set angle(double value) {
     _angle = value;
   }
 
+  @override
   bool get alive {
     return _alive;
   }
 
+  @override
   set alive(bool value) {
     _alive = value;
   }
