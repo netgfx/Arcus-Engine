@@ -9,7 +9,7 @@ import 'package:arcus_engine/helpers/sprite_cache.dart';
 import 'package:vector_math/vector_math.dart' as vectorMath;
 import "package:bezier/bezier.dart";
 import "../../helpers/utils.dart";
-import '../../helpers/rectangle.dart';
+import '../../helpers/Rectangle.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 

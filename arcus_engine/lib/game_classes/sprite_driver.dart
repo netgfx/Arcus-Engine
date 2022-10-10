@@ -13,7 +13,7 @@ import 'package:arcus_engine/game_classes/EntitySystem/sprite_animator.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/world.dart';
 import 'package:arcus_engine/game_classes/EntitySystem/sprite_archetype.dart';
 import 'package:arcus_engine/helpers/game_object.dart';
-import 'package:arcus_engine/helpers/rectangle.dart';
+import 'package:arcus_engine/helpers/Rectangle.dart';
 import 'package:arcus_engine/helpers/action_manager.dart';
 import 'package:arcus_engine/helpers/math/CubicBezier.dart';
 import 'package:arcus_engine/helpers/sprite_cache.dart';
@@ -37,7 +37,7 @@ class SpriteDriverCanvas extends CustomPainter {
  *  @default 1/60 */
   double timeDelta = 1 / 60;
   int printTime = DateTime.now().millisecondsSinceEpoch;
-  int timeDecay = 0;
+  double timeDecay = 0.0;
   int timeToLive = 24;
   double width = 100;
   double height = 100;
@@ -75,7 +75,7 @@ class SpriteDriverCanvas extends CustomPainter {
     this.actions,
   }) : super(repaint: controller) {
     /// the delay in ms based on desired fps
-    timeDecay = (1 / fps * 1000).round();
+    timeDecay = (1 / fps * 1000);
     timeDelta = 1 / fps;
     GameObject.shared.timeDelta = timeDelta;
     this.cameraProps = cameraProps;
@@ -150,8 +150,11 @@ class SpriteDriverCanvas extends CustomPainter {
 
         GameObject.shared.frameTime = controller!.lastElapsedDuration!.inMilliseconds.toDouble();
 
+        double limiter = Utils.shared.clamp(lastElapsed, (timeDecay / 1000) * 0.5, (timeDecay / 1000));
+        //print("$limiter, $lastElapsed, ${(timeDecay / 1000) * 0.5}");
+
         /// in order to run in our required frames per second
-        if (controller!.lastElapsedDuration!.inMilliseconds - currentTime >= timeDecay) {
+        if (controller!.lastElapsedDuration!.inMilliseconds - currentTime >= limiter) {
           /// reset the time
           /// save to world
           GameObject.shared.time = ++frame / fps;

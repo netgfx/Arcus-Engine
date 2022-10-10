@@ -1,11 +1,28 @@
+import 'dart:math';
 import 'dart:ui';
-
+import 'dart:math' as math;
 import 'package:arcus_engine/game_classes/EntitySystem/sprite_tile.dart';
 import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:ui' as ui;
 import 'package:tiled/tiled.dart';
+
+class TileObject {
+  String layerName = "";
+  int textureId = 0;
+  Vector2 texturePos = Vector2(x: 0, y: 0);
+  Vector2 position = Vector2(x: 0, y: 0);
+  int blockSize = 0;
+
+  TileObject({
+    required this.layerName,
+    required this.textureId,
+    required this.texturePos,
+    required this.position,
+    required this.blockSize,
+  });
+}
 
 class TilemapController {
   String id = UniqueKey().toString();
@@ -19,8 +36,9 @@ class TilemapController {
   bool _alive = false;
   bool tilesAlive = false;
   bool _interactive = false;
-  List<Map<String, dynamic>> tiles = [];
+  List<TileObject> tiles = [];
   Map<String, dynamic>? cacheData;
+  List<SpriteTile> children = [];
 
   TilemapController({
     required this.position,
@@ -36,7 +54,7 @@ class TilemapController {
     this.zIndex = zIndex ?? 1;
     this.onEvent = onEvent ?? () => {};
     _interactive = interactive ?? false;
-
+    _alive = startAlive ?? false;
     setCache();
   }
 
@@ -50,8 +68,16 @@ class TilemapController {
       setCache();
     }
 
-    if (tiles.length == 0) {
+    if (tiles.isEmpty) {
       parseTileData();
+    } else {
+      if (children.isNotEmpty) {
+        var totalLength = children.length;
+        for (var i = 0; i < totalLength; i++) {
+          SpriteTile tile = children[i];
+          tile.update(canvas, elapsedTime: elapsedTime, timestamp: timestamp, shouldUpdate: shouldUpdate);
+        }
+      }
     }
 
     /// make the tiles
@@ -60,39 +86,65 @@ class TilemapController {
   void parseTileData() {
     if (cacheData != null) {
       if (cacheData!.isNotEmpty) {
-        int columns = cacheData!["tileData"]["width"];
-        var rows = cacheData!["tileData"]["height"];
-        int textureColumns = cacheData!["textureWidth"] / columns;
-        int textureRows = cacheData!["textureHeight"] / rows;
+        int blockSize = cacheData!["tileData"]["tilemap"]["tilewidth"];
+
+        int columns = cacheData!["tileData"]["tilemap"]["width"];
+        int rows = cacheData!["tileData"]["tilemap"]["height"];
+        int textureColumns = (cacheData!["textureWidth"] / blockSize).round();
+        int textureRows = cacheData!["textureHeight"] / blockSize;
         int counter = 0;
-        for (var i = 0; i < rows; i++) {
-          for (var j = 0; j < columns; j++) {
-            var texturePos = cacheData!["tileData"]["layers"][counter];
+        int totalLayers = cacheData!["tileData"]["tilemap"]["layers"].length;
 
-            if (texturePos == 0) {
+        for (var l = 0; l < totalLayers; l++) {
+          for (var i = 0; i < rows; i++) {
+            for (var j = 0; j < columns; j++) {
+              var texturePos = cacheData!["tileData"]["tilemap"]["layers"][l][counter] - 6;
+              String layerName = "layer$l";
+              if (texturePos < 0) {
+                counter += 1;
+                continue;
+              }
+
+              /// if not 0
+              var textureCoords = Vector2(x: 0, y: 0);
+              double ratio = textureColumns / textureRows;
+              double posY = max(((texturePos / textureColumns).ceil() - 1), 0); //((texturePos + 1) % textureRows) - 1;
+              double posX = ((texturePos) % textureColumns);
+
+              //print("$posY, $posX");
+
+              tiles.add(TileObject(
+                layerName: layerName,
+                textureId: texturePos,
+                blockSize: blockSize,
+                texturePos: Vector2(x: posX, y: posY),
+                position: Vector2(x: j * blockSize / 2, y: i * blockSize / 2 + 50),
+              ));
+
               counter += 1;
-              continue;
             }
-
-            /// if not 0
-            var textureCoords = Vector2(x: 0, y: 0);
-            double ratio = textureColumns / textureRows;
-            double modY = (texturePos - 1) % textureRows;
-            double posX1 = textureColumns.toDouble() * modY;
-            double diff = (posX1 - texturePos).abs();
-            double posX = (textureColumns - diff);
-            print("$modY, $posX");
-            counter += 1;
-            tiles.add({"texturePos": Vector2(x: posX, y: modY)});
           }
+        }
+        //print(tiles);
+        for (var tile in tiles) {
+          children.add(SpriteTile(
+            clipCoordinates: tile.texturePos,
+            tileSize: tile.blockSize,
+            scale: 4,
+            textureName: cacheKey,
+            position: math.Point<double>(tile.position.x.toDouble() * 4, tile.position.y.toDouble() * 4),
+            startAlive: true,
+            interactive: false,
+            enablePhysics: false,
+            centerOffset: const Offset(0, 0),
+          ));
         }
       }
     }
   }
 
   void setCache() {
-    Map<String, dynamic>? cacheItem =
-        GameObject.shared.getSpriteCache().getItem(cacheKey);
+    Map<String, dynamic>? cacheItem = GameObject.shared.getSpriteCache().getItem(cacheKey);
     if (cacheItem != null) {
       cacheData = cacheItem;
     }

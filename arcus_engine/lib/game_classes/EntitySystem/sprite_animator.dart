@@ -31,7 +31,7 @@ class SpriteAnimator with SpriteArchetype {
   int currentIndex = 0;
   int textureWidth = 0;
   int textureHeight = 0;
-  Paint _paint = new Paint();
+  Paint _paint = Paint();
   TDWorld? world = GameObject.shared.getWorld();
   bool? startAlive = false;
   int timeDecay = 0;

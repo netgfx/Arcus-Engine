@@ -7,7 +7,7 @@
 import 'dart:math';
 
 import 'package:arcus_engine/game_classes/EntitySystem/line_point.dart';
-import 'package:arcus_engine/helpers/rectangle.dart';
+import 'package:arcus_engine/helpers/Rectangle.dart';
 import 'package:arcus_engine/helpers/utils.dart';
 
 /**

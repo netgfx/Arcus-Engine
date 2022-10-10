@@ -6,7 +6,7 @@ import 'package:arcus_engine/helpers/game_object.dart';
 import 'package:arcus_engine/helpers/vector_little.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../helpers/rectangle.dart';
+import '../../helpers/Rectangle.dart';
 import 'dart:ui' as ui;
 import 'package:arcus_engine/game_classes/EntitySystem/sprite_archetype.dart';
 
@@ -17,13 +17,16 @@ class SpriteTile with SpriteArchetype {
   TDWorld? world = GameObject.shared.getWorld();
   double _angle = 0;
   bool _alive = false;
+  Paint _paint = Paint();
   Offset _centerOffset = const Offset(0, 0);
   Function? _onCollide;
   Vector2 clipCoordinates = Vector2(x: 0, y: 0);
+  int tileSize = 0;
 
   ///
   SpriteTile({
     required this.clipCoordinates,
+    required this.tileSize,
     textureName,
     position,
     startAlive,
@@ -137,8 +140,8 @@ class SpriteTile with SpriteArchetype {
     }
 
     Point<double> pos = Point(
-      position.x - textureWidth.toDouble() * scale * _centerOffset.dx,
-      position.y - textureHeight.toDouble() * scale * _centerOffset.dy,
+      position.x,
+      position.y,
     );
     renderSprite(canvas, pos, cameraPos, paint);
   }
@@ -146,15 +149,15 @@ class SpriteTile with SpriteArchetype {
   void renderSprite(Canvas canvas, Point<double> pos, Rect cameraPos, Paint paint) {
     updateCanvas(canvas, pos.x + cameraPos.left * -1, pos.y + cameraPos.top * -1, scale, angle, () {
       canvas.drawImageRect(
-        texture!,
-        Rect.fromLTWH(0, 0, textureWidth.toDouble(), textureHeight.toDouble()),
+        this.texture!,
+        Rect.fromLTWH(clipCoordinates.x.toDouble() * tileSize, clipCoordinates.y.toDouble() * tileSize, tileSize.toDouble(), tileSize.toDouble()),
         Rect.fromLTWH(
           0,
           0,
-          textureWidth.toDouble(),
-          textureHeight.toDouble(),
+          tileSize.toDouble(),
+          tileSize.toDouble(),
         ),
-        paint,
+        _paint,
       );
     }, translate: true);
   }

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:arcus_engine/game_classes/EntitySystem/Camera.dart';
-import 'package:arcus_engine/helpers/rectangle.dart';
+import 'package:arcus_engine/helpers/Rectangle.dart';
 import 'package:arcus_engine/helpers/sprite_cache.dart';
 
 import '../../helpers/utils.dart';

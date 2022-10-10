@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:ui';
-import '../../helpers/rectangle.dart';
+import '../../helpers/Rectangle.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' as vectorMath;
 import 'package:arcus_engine/helpers/utils.dart';
