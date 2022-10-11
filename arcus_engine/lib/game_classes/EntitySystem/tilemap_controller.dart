@@ -73,10 +73,10 @@ class TilemapController {
     } else {
       if (children.isNotEmpty) {
         var totalLength = children.length;
-        for (var i = 0; i < totalLength; i++) {
-          SpriteTile tile = children[i];
-          tile.update(canvas, elapsedTime: elapsedTime, timestamp: timestamp, shouldUpdate: shouldUpdate);
-        }
+        //for (var i = 0; i < totalLength; i++) {
+        SpriteTile tile = children[0];
+        tile.update(canvas, elapsedTime: elapsedTime, timestamp: timestamp, shouldUpdate: shouldUpdate);
+        //}
       }
     }
 
@@ -118,7 +118,7 @@ class TilemapController {
                 textureId: texturePos,
                 blockSize: blockSize,
                 texturePos: Vector2(x: posX, y: posY),
-                position: Vector2(x: j * blockSize / 2, y: i * blockSize / 2 + 50),
+                position: Vector2(x: j * blockSize, y: i * blockSize + 100),
               ));
 
               counter += 1;
@@ -126,19 +126,20 @@ class TilemapController {
           }
         }
         //print(tiles);
-        for (var tile in tiles) {
-          children.add(SpriteTile(
-            clipCoordinates: tile.texturePos,
-            tileSize: tile.blockSize,
-            scale: 4,
-            textureName: cacheKey,
-            position: math.Point<double>(tile.position.x.toDouble() * 4, tile.position.y.toDouble() * 4),
-            startAlive: true,
-            interactive: false,
-            enablePhysics: false,
-            centerOffset: const Offset(0, 0),
-          ));
-        }
+        //for (var tile in tiles) {
+        children.add(SpriteTile(
+          tiles: tiles,
+          tileSize: blockSize,
+          scale: 3,
+          textureName: cacheKey,
+          pixelGraphics: true,
+          //position: math.Point<double>(tile.position.x.toDouble(), tile.position.y.toDouble()),
+          startAlive: true,
+          interactive: false,
+          enablePhysics: false,
+          centerOffset: const Offset(0, 0),
+        ));
+        //}
       }
     }
   }

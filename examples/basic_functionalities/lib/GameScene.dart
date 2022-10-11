@@ -190,12 +190,12 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       //     onEvent: (Point event, SpriteArchetype sprite) => {
       //           print("this greyblock is tapped"),
       //         }),
-      Sprite(
-        position: const Point<double>(0.0, 0.0),
-        textureName: "bg",
-        startAlive: true,
-        scale: 1.0,
-      ),
+      // Sprite(
+      //   position: const Point<double>(0.0, 0.0),
+      //   textureName: "bg",
+      //   startAlive: true,
+      //   scale: 1.0,
+      // ),
       SpriteAnimator(
         position: Point<double>(100.0, 100.0),
         textureName: "bat",
