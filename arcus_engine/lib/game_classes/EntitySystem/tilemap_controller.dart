@@ -90,8 +90,22 @@ class TilemapController {
 
         int columns = cacheData!["tileData"]["tilemap"]["width"];
         int rows = cacheData!["tileData"]["tilemap"]["height"];
-        int textureColumns = (cacheData!["textureWidth"] / blockSize).round();
-        int textureRows = cacheData!["textureHeight"] / blockSize;
+
+        /// GUARD FIX - possibly only needed for web
+        int gapsCount = (cacheData!["textureWidth"] / blockSize).ceil();
+        if (gapsCount / blockSize >= 1) {
+          gapsCount -= 1;
+        }
+        int spacesCount = (cacheData!["textureHeight"] / blockSize).ceil();
+        if (spacesCount / blockSize >= 1) {
+          spacesCount -= 1;
+        }
+        int realWidth = cacheData!["textureWidth"] - gapsCount;
+        int realHeight = cacheData!["textureHeight"] - spacesCount;
+
+        /// TODO: remove this when drawAtlas works correctly
+        int textureColumns = (realWidth / blockSize).round();
+        int textureRows = (realHeight / blockSize).round();
         int counter = 0;
         int totalLayers = cacheData!["tileData"]["tilemap"]["layers"].length;
 
@@ -130,7 +144,7 @@ class TilemapController {
         children.add(SpriteTile(
           tiles: tiles,
           tileSize: blockSize,
-          scale: 3,
+          scale: 4,
           textureName: cacheKey,
           pixelGraphics: true,
           //position: math.Point<double>(tile.position.x.toDouble(), tile.position.y.toDouble()),

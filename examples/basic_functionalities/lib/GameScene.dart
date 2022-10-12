@@ -106,8 +106,8 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       );
       cache.addItem(
         "tilemap",
-        texturePath: "assets/tiles/tiles_packed.png",
-        dataPath: "assets/tiles/tilemap.tmj",
+        texturePath: "assets/tiles/tiles_packed_guard.png",
+        dataPath: "assets/tiles/tilemap_guard.tmj",
         dataType: "tilemap",
       );
 

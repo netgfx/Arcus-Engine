@@ -167,31 +167,35 @@ class SpriteTile with SpriteArchetype {
               anchorX: 0.0,
               anchorY: 0.0,
               // Location at which to draw the center of the sprite
-              translateX: sprite.position.x * scale,
-              translateY: sprite.position.y * scale,
+              translateX: (sprite.position.x + cameraPos.left * -1) * scale,
+              translateY: (sprite.position.y + cameraPos.top * -1) * scale,
             ),
         ],
         <Rect>[
           for (TileObject sprite in tiles)
-            Rect.fromLTWH(sprite.texturePos.x.toDouble() * tileSize, sprite.texturePos.y.toDouble() * tileSize, tileSize.toDouble(), tileSize.toDouble()),
+            Rect.fromLTWH(sprite.texturePos.x.toDouble() * tileSize + (sprite.texturePos.x + 1),
+                sprite.texturePos.y.toDouble() * tileSize + (sprite.texturePos.y + 1), tileSize.toDouble(), tileSize.toDouble()),
         ],
         null,
         null,
         null,
         paint);
 
-    // Rect dst = Rect.fromLTWH(
-    //   posX * scale,
-    //   posY * scale,
-    //   tileSize.toDouble() * scale,
-    //   tileSize.toDouble() * scale,
-    // );
-    // canvas.drawImageRect(
-    //   this.texture!,
-    //   Rect.fromLTWH(clipCoordinates.x.toDouble() * tileSize, clipCoordinates.y.toDouble() * tileSize, tileSize.toDouble(), tileSize.toDouble()),
-    //   dst,
-    //   _paint,
-    // );
+    // for (var sprite in tiles) {
+    //   Rect dst = Rect.fromLTWH(
+    //     (sprite.position.x + cameraPos.left * -1) * scale,
+    //     (sprite.position.y + cameraPos.top * -1) * scale,
+    //     tileSize.toDouble() * scale,
+    //     tileSize.toDouble() * scale,
+    //   );
+    //   canvas.drawImageRect(
+    //     texture!,
+    //     Rect.fromLTWH(sprite.texturePos.x.toDouble() * tileSize + (sprite.texturePos.x + 1),
+    //         sprite.texturePos.y.toDouble() * tileSize + (sprite.texturePos.y + 1), tileSize.toDouble(), tileSize.toDouble()),
+    //     dst,
+    //     paint,
+    //   );
+    // }
   }
 
   void setCache() {
