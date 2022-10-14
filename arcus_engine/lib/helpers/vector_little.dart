@@ -35,11 +35,11 @@ class Vector2 {
   /** Create a 2D vector with the x and y passed in, can also be created with vec2()
      *  @param {Number} [x=0] - X axis location
      *  @param {Number} [y=0] - Y axis location */
-  Vector2({x = 0, y = 0}) {
+  Vector2({x = 0.0, y = 0.0}) {
     /** @property {Number} - X axis location */
-    this.x = x ?? 0;
+    this.x = x.toDouble() ?? 0.0;
     /** @property {Number} - Y axis location */
-    this.y = y ?? 0;
+    this.y = y.toDouble() ?? 0.0;
   }
 
   /** Returns a new vector that is a copy of this

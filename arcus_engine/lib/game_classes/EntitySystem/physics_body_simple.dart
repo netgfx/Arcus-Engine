@@ -29,7 +29,7 @@ class PhysicsBodyProperties {
   int renderOrder = 0;
 
   /// @property {Vector2} [velocity=new Vector2()]                - Velocity of the object */
-  Vector2 velocity = Vector2(x: 0, y: 0);
+  Vector2 velocity = Vector2(x: 0.0, y: 0.0);
 
   /// @property {Number} [angleVelocity=0]                        - Angular velocity of the object */
   double angleVelocity = 0;
@@ -65,7 +65,7 @@ class PhysicsBodyProperties {
     this.angleVelocity = angleVelocity ?? 0;
     this.restitution = restitution ?? 0.99;
     this.collideSolidObjects = collideSolidObjects ?? true;
-    this.velocity = velocity ?? Vector2(x: 0, y: 0);
+    this.velocity = velocity ?? Vector2(x: 0.0, y: 0.0);
     this.immovable = immovable ?? false;
     collideWorldBounds = collideOnWorldBounds ?? true;
   }

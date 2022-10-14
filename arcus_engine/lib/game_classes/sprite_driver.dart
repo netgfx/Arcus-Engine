@@ -276,7 +276,7 @@ class SpriteDriverCanvas extends CustomPainter {
 
     // update camera
     if (_camera != null) {
-      _camera!.update();
+      //_camera!.update();
       //print("${_camera!.getCameraBounds()} ${GameObject.shared.world!.getCamera().getCameraBounds()}");
     }
   }

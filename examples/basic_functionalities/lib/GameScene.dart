@@ -43,6 +43,8 @@ class GameScene extends StatefulWidget {
 class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
   late AnimationController _controller;
   BoxConstraints? viewportConstraints;
+  late FocusNode _node;
+  late FocusAttachment _nodeAttachment;
 
   //
   Map<String, dynamic> spriteCache = {};
@@ -58,6 +60,8 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _node = FocusNode(debugLabel: "game_focus");
+    _nodeAttachment = _node.attach(context, onKey: handleKeyPress);
     _tween = TweenManager(ticker: this);
     _controller = AnimationController(vsync: this, duration: Duration(seconds: 1));
     //_spriteController = AnimationController(vsync: this, duration: Duration(seconds: 1));
@@ -131,6 +135,8 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
   void dispose() {
     _controller.dispose();
     actions.actionController.close();
+    _node.dispose();
+    _nodeAttachment.detach();
     super.dispose();
   }
 
@@ -214,16 +220,16 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
       TextObject(
         id: "mainText",
         text: "Hello Arcus!",
-        position: vec2.Vector2(x: 100, y: 100),
-        fontSize: 56,
+        position: vec2.Vector2(x: 100.0, y: 100.0),
+        fontSize: 56.0,
         color: Colors.green,
         startAlive: true,
         zIndex: 2,
         maxLines: 2,
         border: true,
-        borderWidth: 1,
+        borderWidth: 1.0,
         borderColor: Colors.orange,
-        maxWidth: 400,
+        maxWidth: 400.0,
         fontFamily: "IrishGrover",
       ),
       TilemapController(
@@ -349,6 +355,26 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
     });
   }
 
+  KeyEventResult handleKeyPress(FocusNode node, RawKeyEvent event) {
+    if (event is RawKeyDownEvent) {
+      debugPrint('Focus node ${node.debugLabel} got key event: ${event.logicalKey}');
+      if (event.logicalKey == LogicalKeyboardKey.keyR) {
+        debugPrint('Changing color to red.');
+
+        return KeyEventResult.handled;
+      } else if (event.logicalKey == LogicalKeyboardKey.keyG) {
+        debugPrint('Changing color to green.');
+
+        return KeyEventResult.handled;
+      } else if (event.logicalKey == LogicalKeyboardKey.keyB) {
+        debugPrint('Changing color to blue.');
+
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
+  }
+
   void onTap(BuildContext context, TapDownDetails details) {
     //checkCollision();
     // setState(() {
@@ -384,49 +410,52 @@ class _GameSceneState extends State<GameScene> with TickerProviderStateMixin {
               onPanStart: (details) => onPanStart(context, details),
               onPanUpdate: (details) => onPanUpdate(context, details),
               onPanEnd: (details) => onPanEnd(context, details),
-              child: Stack(children: [
-                this.cacheReady == false
-                    ? Center(
-                        child: CircularProgressIndicator(
-                        key: UniqueKey(),
-                        strokeWidth: 10,
-                      ))
-                    : Positioned(
-                        top: 0,
-                        left: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 0, left: 0),
-                          child: Stack(children: [
-                            RepaintBoundary(
-                              child: CustomPaint(
-                                key: UniqueKey(),
-                                isComplex: true,
-                                willChange: false,
-                                painter: SpriteDriverCanvas(
-                                  controller: _controller,
-                                  fps: 60,
-                                  sprites: spritesArr,
-                                  cache: cache,
-                                  actions: cache.isEmpty() ? null : actions,
-                                  width: viewportConstraints.maxWidth,
-                                  height: viewportConstraints.maxHeight,
-                                  cameraProps: CameraProps(
-                                    enabled: true,
-                                    canvasSize: Size(viewportConstraints.maxWidth, viewportConstraints.maxHeight),
-                                    mapSize: Size(
-                                      viewportConstraints.maxWidth,
-                                      viewportConstraints.maxHeight,
+              child: KeyboardListener(
+                focusNode: _node,
+                child: Stack(children: [
+                  this.cacheReady == false
+                      ? Center(
+                          child: CircularProgressIndicator(
+                          key: UniqueKey(),
+                          strokeWidth: 10,
+                        ))
+                      : Positioned(
+                          top: 0,
+                          left: 0,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 0, left: 0),
+                            child: Stack(children: [
+                              RepaintBoundary(
+                                child: CustomPaint(
+                                  key: UniqueKey(),
+                                  isComplex: true,
+                                  willChange: false,
+                                  painter: SpriteDriverCanvas(
+                                    controller: _controller,
+                                    fps: 60,
+                                    sprites: spritesArr,
+                                    cache: cache,
+                                    actions: cache.isEmpty() ? null : actions,
+                                    width: viewportConstraints.maxWidth,
+                                    height: viewportConstraints.maxHeight,
+                                    cameraProps: CameraProps(
+                                      enabled: true,
+                                      canvasSize: Size(viewportConstraints.maxWidth, viewportConstraints.maxHeight),
+                                      mapSize: Size(
+                                        viewportConstraints.maxWidth,
+                                        viewportConstraints.maxHeight,
+                                      ),
+                                      followObject: "bat",
+                                      offset: const Point<double>(0.0, 0.0),
                                     ),
-                                    followObject: "bat",
-                                    offset: const Point<double>(0.0, 0.0),
                                   ),
                                 ),
                               ),
-                            ),
-                          ]),
+                            ]),
+                          ),
                         ),
-                      ),
-              ]),
+                ]),
+              ),
             );
             //);
           })),

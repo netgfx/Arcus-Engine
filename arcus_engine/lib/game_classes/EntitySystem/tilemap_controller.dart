@@ -112,7 +112,7 @@ class TilemapController {
         for (var l = 0; l < totalLayers; l++) {
           for (var i = 0; i < rows; i++) {
             for (var j = 0; j < columns; j++) {
-              var texturePos = cacheData!["tileData"]["tilemap"]["layers"][l][counter] - 6;
+              double texturePos = cacheData!["tileData"]["tilemap"]["layers"][l][counter] - 6.0;
               String layerName = "layer$l";
               if (texturePos < 0) {
                 counter += 1;
@@ -123,13 +123,13 @@ class TilemapController {
               var textureCoords = Vector2(x: 0, y: 0);
               double ratio = textureColumns / textureRows;
               double posY = max(((texturePos / textureColumns).ceil() - 1), 0); //((texturePos + 1) % textureRows) - 1;
-              double posX = ((texturePos) % textureColumns);
+              double posX = ((texturePos) % textureColumns).toDouble();
 
               //print("$posY, $posX");
 
               tiles.add(TileObject(
                 layerName: layerName,
-                textureId: texturePos,
+                textureId: texturePos.round(),
                 blockSize: blockSize,
                 texturePos: Vector2(x: posX, y: posY),
                 position: Vector2(x: j * blockSize, y: i * blockSize + 100),
@@ -144,7 +144,7 @@ class TilemapController {
         children.add(SpriteTile(
           tiles: tiles,
           tileSize: blockSize,
-          scale: 4,
+          scale: 3.0,
           textureName: cacheKey,
           pixelGraphics: true,
           //position: math.Point<double>(tile.position.x.toDouble(), tile.position.y.toDouble()),
