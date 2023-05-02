@@ -1,11 +1,10 @@
 # This is a generated file; do not edit or check into version control.
-audio_session=C:\\SDK\\flutter_windows_1.22.0-stable\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\audio_session-0.1.10\\
-flutter_image_compress=C:\\SDK\\flutter_windows_1.22.0-stable\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\flutter_image_compress-1.1.1\\
-just_audio=C:\\SDK\\flutter_windows_1.22.0-stable\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\just_audio-0.9.28\\
-just_audio_web=C:\\SDK\\flutter_windows_1.22.0-stable\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\just_audio_web-0.4.7\\
-path_provider=C:\\SDK\\flutter_windows_1.22.0-stable\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider-2.0.11\\
-path_provider_android=C:\\SDK\\flutter_windows_1.22.0-stable\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider_android-2.0.19\\
-path_provider_ios=C:\\SDK\\flutter_windows_1.22.0-stable\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider_ios-2.0.11\\
-path_provider_linux=C:\\SDK\\flutter_windows_1.22.0-stable\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider_linux-2.1.7\\
-path_provider_macos=C:\\SDK\\flutter_windows_1.22.0-stable\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider_macos-2.0.6\\
-path_provider_windows=C:\\SDK\\flutter_windows_1.22.0-stable\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider_windows-2.1.2\\
+audio_session=C:\\Users\\djmid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\audio_session-0.1.13\\
+flutter_image_compress=C:\\Users\\djmid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\flutter_image_compress-1.1.3\\
+just_audio=C:\\Users\\djmid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\just_audio-0.9.32\\
+just_audio_web=C:\\Users\\djmid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\just_audio_web-0.4.7\\
+path_provider=C:\\Users\\djmid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\path_provider-2.0.14\\
+path_provider_android=C:\\Users\\djmid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\path_provider_android-2.0.24\\
+path_provider_foundation=C:\\Users\\djmid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\path_provider_foundation-2.2.1\\
+path_provider_linux=C:\\Users\\djmid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\path_provider_linux-2.1.10\\
+path_provider_windows=C:\\Users\\djmid\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\path_provider_windows-2.1.5\\

@@ -63,7 +63,7 @@ class ActionManager {
     if (listenable != null) {
       await listenable?.cancel();
     }
-    listenable = this.actionDone.listen(callback);
+    listenable = actionDone.listen(callback);
   }
 
   Stream get actionDone => actionController.stream;
